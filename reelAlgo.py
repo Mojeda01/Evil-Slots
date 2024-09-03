@@ -1,4 +1,5 @@
 import numpy as np
+import combination_list as cl
 
 # 1. Define game elememnts
 # SYMBOLS LIST
@@ -18,17 +19,16 @@ def selected_model():
     # Step 2: Develop Initial spin_reels() Function
     def spin_reels():
         """Simulates spinning of the reels using weighted random selection with numpy."""
-        reel_results = []
-
-        for reel_name, reel in reels.items():
-            # Get symbols and their corresponding weights
-            symbols = list(reel.keys())
-            weights = list(reel.values())
-
-            # Use numpy's random.choice to select a symbol based on weights
-            selected_symbol = np.random.choice(symbols, p=np.array(weights) / sum(weights))
-            reel_results.append(selected_symbol)
-        return reel_results
+        # Pre-calculate probabilities for each reel
+        reel_probabilities = {
+            reel_name: np.array(list(reel.values())) / sum(reel.values())
+            for reel_name, reel in reels.items()
+        }
+        # Use list comprehension for more concise code
+        return [
+            np.random.choice(list(reel.keys()), p=reel_probabilities[reel_name])
+            for reel_name, reel in reels.items()
+        ]
     
     print("Spinning the reels...")
     result = spin_reels()
