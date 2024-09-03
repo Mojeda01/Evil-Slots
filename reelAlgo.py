@@ -1,5 +1,6 @@
 import numpy as np
 import combination_list as cl
+from combination_list import combinations  # Import the combinations
 
 # 1. Define game elememnts
 # SYMBOLS LIST
@@ -30,12 +31,30 @@ def selected_model():
             for reel_name, reel in reels.items()
         ]
     
+    def check_win(result):
+        """Check if the spin result matches any winning combination."""
+        total_points = 0
+        triggered_events = []
+
+        for combo in combinations:
+            matches = all(
+                symbol == combo['symbols'][i] or combo['symbols'][i] == '*'
+                for i, symbol in enumerate(result)
+            )
+            if matches:
+                total_points += combo['points']
+                if 'trigger' in combo:
+                    triggered_events.append(combo['trigger'])
+
+        return total_points, triggered_events
+
     print("Spinning the reels...")
     result = spin_reels()
     print(f'Result: {result[0]} | {result[1]} | {result[2]} | {result[3]} | {result[4]}')
 
-    # WE HAVE NOT ACTUALLY TOLD THE PROGRAM IF ANY COMBINATION GIVES ANY POINTS
-    # SO THE PROGRAM DOES NOT KNOW; IT ONLY JUST DISPLAYS THE RESULTS! :D
-
+    points, events = check_win(result)
+    print(f'Points won: {points}')
+    if events:
+        print(f'Triggered events: {", ".join(events)}')
 
 selected_model()
