@@ -52,7 +52,3 @@ if __name__ == "__main__":
     print(f"Initial player balance: {get_player_balance()}")
     deposit_to_player(100)
     print(f"Player balance after deposit: {get_player_balance()}")
-    if place_bet(50):
-        print(f"Player balance after betting: {get_player_balance()}")
-        add_winnings(75)
-        print(f"Player balance after winning: {get_player_balance()}")
