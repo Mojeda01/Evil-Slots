@@ -21,4 +21,15 @@ combinations = [
     {'symbols': ['CLOC', 'CLOC', 'CLOC', '*', '*'], 'points': 30},
     {'symbols': ['STAR', 'STAR', 'STAR', '*', '*'], 'points': 20},
     {'symbols': ['DIAMN', 'DIAMN', 'DIAMN', '*', '*'], 'points': 75},
+
+    # New special combinations
+    {'symbols': ['WILD', 'WILD', 'WILD', '*', '*'], 'points': 500},
+    {'symbols': ['WILD', 'WILD', '*', '*', '*'], 'points': 100},
+    {'symbols': ['WILD', '*', '*', '*', '*'], 'points': 10},
+    {'symbols': ['BONUS', 'BONUS', 'BONUS', '*', '*'], 'points': 200, 'trigger': 'bonus_game'},
+    {'symbols': ['SCAT', 'SCAT', 'SCAT', '*', '*'], 'points': 0, 'trigger': 'free_spins'},
+    {'symbols': ['JACKP', 'JACKP', 'JACKP', 'JACKP', 'JACKP'], 'points': 10000, 'trigger': 'jackpot'},
+    {'symbols': ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN'], 'points': 150},
+    {'symbols': ['DIAMN', 'DIAMN', '*', '*', '*'], 'points': 25},
+    {'symbols': ['CHER', 'CHER', '*', '*', '*'], 'points': 15},
 ]
