@@ -1,4 +1,6 @@
 import numpy as np
+import json
+from datetime import datetime
 from combination_list import combinations  # Import the combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance
 
@@ -46,6 +48,27 @@ def selected_model():
 
         return total_points, triggered_events
 
+    def log_result(result, bet_amount, points, winnings, balance):
+        """Log the game result to a JSON file."""
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "result": result,
+            "bet_amount": bet_amount,
+            "points_won": points,
+            "winnings": winnings,
+            "balance_after": balance
+        }
+
+        try:
+            with open('logs.json', 'r+') as f:
+                data = json.load(f)
+                data.append(log_entry)
+                f.seek(0)
+                json.dump(data, f, indent=4)
+        except FileNotFoundError:
+            with open('logs.json', 'w') as f:
+                json.dump([log_entry], f, indent=4)
+
     def play_game(bet_amount=10):
         current_balance = get_player_balance()
         print(f"Current balance: ${current_balance:.2f}")
@@ -67,8 +90,12 @@ def selected_model():
 
             winnings = points * 0.1  # Convert points to actual winnings
             add_winnings(winnings)
+            new_balance = get_player_balance()
             print(f"Winnings: ${winnings:.2f}")
-            print(f"New balance: ${get_player_balance():.2f}")
+            print(f"New balance: ${new_balance:.2f}")
+
+            # Log the result
+            log_result(result, bet_amount, points, winnings, new_balance)
         else:
             print("Error placing bet. Please try again.")
 
