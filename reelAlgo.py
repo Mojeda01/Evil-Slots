@@ -49,24 +49,33 @@ def selected_model():
 
         return total_points, triggered_events
 
-    bet_amount = 10  # Set your desired bet amount
-    print(f"Current balance: {get_player_balance()}")
-    
-    if place_bet(bet_amount):
-        print("Spinning the reels...")
-        result = spin_reels()
-        print(f'Result: {result[0]} | {result[1]} | {result[2]} | {result[3]} | {result[4]}')
+    def play_game(bet_amount=10):
+        current_balance = get_player_balance()
+        print(f"Current balance: ${current_balance:.2f}")
+        
+        if current_balance < bet_amount:
+            print("Not enough balance to place bet.")
+            return
 
-        points, events = check_win(result)
-        print(f'Points won: {points}')
-        if events:
-            print(f'Triggered events: {", ".join(events)}')
+        if place_bet(bet_amount):
+            print(f"Placing bet: ${bet_amount:.2f}")
+            print("Spinning the reels...")
+            result = spin_reels()
+            print(f'Result: {" | ".join(result)}')
 
-        winnings = points * 0.1  # Convert points to actual winnings
-        add_winnings(winnings)
-        print(f"Winnings: {winnings}")
-        print(f"New balance: {get_player_balance()}")
-    else:
-        print("Not enough balance to place bet.")
+            points, events = check_win(result)
+            print(f'Points won: {points}')
+            if events:
+                print(f'Triggered events: {", ".join(events)}')
+
+            winnings = points * 0.1  # Convert points to actual winnings
+            add_winnings(winnings)
+            print(f"Winnings: ${winnings:.2f}")
+            print(f"New balance: ${get_player_balance():.2f}")
+        else:
+            print("Error placing bet. Please try again.")
+
+    # Example usage
+    play_game()
 
 selected_model()

@@ -22,16 +22,18 @@ def deposit_to_player(amount):
     if transfer_funds(amount, bank_wallet, player_wallet):
         save_wallet('bank_wallet.json', bank_wallet)
         save_wallet('player_wallet.json', player_wallet)
-        print(f"Successfully deposited {amount} to player wallet.")
+        print(f"Successfully deposited ${amount:.2f} to player wallet.")
+        return True
     else:
         print("Insufficient funds in bank wallet.")
+        return False
 
 def place_bet(amount):
     player_wallet = load_wallet('player_wallet.json')
     if player_wallet['balance'] >= amount:
         player_wallet['balance'] -= amount
         save_wallet('player_wallet.json', player_wallet)
-        print(f"Bet of {amount} placed successfully.")
+        print(f"Bet of ${amount:.2f} placed successfully.")
         return True
     else:
         print("Insufficient funds in player wallet.")
@@ -41,11 +43,19 @@ def add_winnings(amount):
     player_wallet = load_wallet('player_wallet.json')
     player_wallet['balance'] += amount
     save_wallet('player_wallet.json', player_wallet)
-    print(f"Winnings of {amount} added to player wallet.")
+    print(f"Winnings of ${amount:.2f} added to player wallet.")
 
 def get_player_balance():
     player_wallet = load_wallet('player_wallet.json')
     return player_wallet['balance']
+
+def format_currency(amount):
+    return f"${amount:.2f}"
+
+def update_wallet(file_name, new_balance):
+    wallet = load_wallet(file_name)
+    wallet['balance'] = new_balance
+    save_wallet(file_name, wallet)
 
 # Example usage
 if __name__ == "__main__":
