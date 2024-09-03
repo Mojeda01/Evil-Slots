@@ -1,6 +1,7 @@
 import numpy as np
 import combination_list as cl
 from combination_list import combinations  # Import the combinations
+from wallet_manager import place_bet, add_winnings, get_player_balance
 
 # 1. Define game elememnts
 # SYMBOLS LIST
@@ -48,13 +49,24 @@ def selected_model():
 
         return total_points, triggered_events
 
-    print("Spinning the reels...")
-    result = spin_reels()
-    print(f'Result: {result[0]} | {result[1]} | {result[2]} | {result[3]} | {result[4]}')
+    bet_amount = 10  # Set your desired bet amount
+    print(f"Current balance: {get_player_balance()}")
+    
+    if place_bet(bet_amount):
+        print("Spinning the reels...")
+        result = spin_reels()
+        print(f'Result: {result[0]} | {result[1]} | {result[2]} | {result[3]} | {result[4]}')
 
-    points, events = check_win(result)
-    print(f'Points won: {points}')
-    if events:
-        print(f'Triggered events: {", ".join(events)}')
+        points, events = check_win(result)
+        print(f'Points won: {points}')
+        if events:
+            print(f'Triggered events: {", ".join(events)}')
+
+        winnings = points * 0.1  # Convert points to actual winnings
+        add_winnings(winnings)
+        print(f"Winnings: {winnings}")
+        print(f"New balance: {get_player_balance()}")
+    else:
+        print("Not enough balance to place bet.")
 
 selected_model()
