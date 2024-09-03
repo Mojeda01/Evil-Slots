@@ -1,24 +1,21 @@
 import numpy as np
-import combination_list as cl
 from combination_list import combinations  # Import the combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance
 
-# 1. Define game elememnts
+# 1. Define game elements
 # SYMBOLS LIST
-sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN']
+sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']
 
 def selected_model():
-
     # Reels configuration: Defining probabilities for each symbol on each reel
     reels = {
-        'Reel1':{sym[0]:5,sym[1]:4,sym[2]:3,sym[3]:2,sym[4]:1}, # Weights for Reel 1
-        'Reel2':{sym[0]:5,sym[1]:4,sym[2]:3,sym[3]:2,sym[4]:1}, # Weights for Reel 2
-        'Reel3':{sym[0]:5,sym[1]:4,sym[2]:3,sym[3]:2,sym[4]:1}, # Weights for Reel 3
-        'Reel4':{sym[0]:5,sym[1]:4,sym[2]:3,sym[3]:2,sym[4]:1}, # Weights for Reel 4
-        'Reel5':{sym[0]:5,sym[1]:4,sym[2]:3,sym[3]:2,sym[4]:1}, # Weights for Reel 5
+        'Reel1': {s: 1 for s in sym},  # Equal probability for simplicity
+        'Reel2': {s: 1 for s in sym},
+        'Reel3': {s: 1 for s in sym},
+        'Reel4': {s: 1 for s in sym},
+        'Reel5': {s: 1 for s in sym},
     }
     
-    # Step 2: Develop Initial spin_reels() Function
     def spin_reels():
         """Simulates spinning of the reels using weighted random selection with numpy."""
         # Pre-calculate probabilities for each reel
