@@ -1,12 +1,11 @@
 import numpy as np
 import json
 from datetime import datetime
-from combination_list import combinations  # Import the combinations
-from wallet_manager import place_bet, add_winnings, get_player_balance
+from combination_list import combinations
+from wallet_manager import place_bet, add_winnings, get_player_balance, convert_to_tokens, convert_to_money, deposit_to_player, withdraw_to_bank
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
 import random
 
-# 1. Define game elements
 # SYMBOLS LIST
 sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']
 
@@ -102,20 +101,28 @@ def selected_model():
             "V-shape", "Inverted V-shape", "W-shape", "M-shape"
         ]
 
+        # Iterate through each payline
         for i, payline in enumerate(paylines):
+            # Extract the symbols for the current payline
             line_result = [result[x][y] for x, y in payline]
             
+            # Check each winning combination against the current payline
             for combo in combinations:
+                # Check if all symbols in the payline match the combination
+                # '*' in the combination acts as a wildcard
                 matches = all(
                     symbol == combo['symbols'][i] or combo['symbols'][i] == '*'
                     for i, symbol in enumerate(line_result)
                 )
                 if matches:
+                    # If there's a match, add points and record the winning payline
                     total_points += combo['points']
                     winning_paylines.append(payline_names[i])
+                    # Check if this combination triggers a special event
                     if 'trigger' in combo:
                         triggered_events.append(combo['trigger'])
 
+        # Return the total points won, any triggered events, and the winning paylines
         return total_points, triggered_events, winning_paylines
 
     def log_result(result, bet_amount, points, winnings, balance, jackpot_win=0, bonus_win=0, current_jackpot=0):
@@ -143,21 +150,53 @@ def selected_model():
             with open('logs.json', 'w') as f:
                 json.dump([log_entry], f, indent=4)
 
-    def play_game(bet_amount=10):
-        """Main game function that simulates a single play."""
-        current_balance = get_player_balance()
+    def display_wallet():
+        balance = get_player_balance()
+        tokens = get_player_balance(get_tokens=True)
+        print(f"Current balance: ${balance:.2f}")
+        print(f"Current tokens: {tokens}")
+
+    def exchange_menu():
+        while True:
+            display_wallet()
+            print("\nExchange Menu:")
+            print("1. Deposit Money")
+            print("2. Convert Money to Tokens")
+            print("3. Convert Tokens to Money")
+            print("4. Withdraw Money to Bank")
+            print("5. Return to Main Menu")
+            choice = input("Enter your choice: ")
+
+            if choice == '1':
+                amount = float(input("Enter amount to deposit: $"))
+                deposit_to_player(amount)
+            elif choice == '2':
+                amount = float(input("Enter amount to convert to tokens: $"))
+                convert_to_tokens(amount, 10)  # Using an exchange rate of 1:10
+            elif choice == '3':
+                tokens = int(input("Enter number of tokens to convert: "))
+                convert_to_money(tokens, 10)  # Using an exchange rate of 1:10
+            elif choice == '4':
+                amount = float(input("Enter amount to withdraw: $"))
+                withdraw_to_bank(amount)
+            elif choice == '5':
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
+    def play_game(bet_amount=10, use_tokens=False):
+        current_balance = get_player_balance(get_tokens=use_tokens)
         current_jackpot = load_jackpot()
-        print(f"Current balance: ${current_balance:.2f}")
+        print(f"Current {'tokens' if use_tokens else 'balance'}: {'$' if not use_tokens else ''}{current_balance:.2f}")
         print(f"Current jackpot: ${current_jackpot:.2f}")
         
-        # Check if player has enough balance to place bet
         if current_balance < bet_amount:
             print("Not enough balance to place bet.")
             return
 
-        if place_bet(bet_amount):
+        if place_bet(bet_amount, use_tokens):
             new_jackpot = increment_jackpot(bet_amount)
-            print(f"Placing bet: ${bet_amount:.2f}")
+            print(f"Placing bet: {'$' if not use_tokens else ''}{bet_amount:.2f}")
             print(f"Jackpot increased to: ${new_jackpot:.2f}")
             print("Spinning the reels...")
             result = spin_reels()
@@ -190,24 +229,47 @@ def selected_model():
                 bonus_win = play_bonus_game()
                 if bonus_win > 0:
                     winnings += bonus_win
-                    print(f"You won ${bonus_win:.2f} in the Bonus Round!")
+                    print(f"You won {'$' if not use_tokens else ''}{bonus_win:.2f} in the Bonus Round!")
                 else:
                     print("No additional winnings from the Bonus Round.")
             else:
                 print("No bonus round triggered.")
 
-            add_winnings(winnings)
+            add_winnings(winnings, use_tokens)
             
-            new_balance = get_player_balance()
-            print(f"Total winnings: ${winnings:.2f}")
-            print(f"New balance: ${new_balance:.2f}")
+            new_balance = get_player_balance(get_tokens=use_tokens)
+            print(f"Total winnings: {'$' if not use_tokens else ''}{winnings:.2f}")
+            print(f"New {'tokens' if use_tokens else 'balance'}: {'$' if not use_tokens else ''}{new_balance:.2f}")
 
             # Log the result
             log_result(result, bet_amount, points, winnings, new_balance, jackpot_win=0, bonus_win=0, current_jackpot=current_jackpot)
         else:
             print("Error placing bet. Please try again.")
 
-    # Example usage
-    play_game()
+    def main_menu():
+        while True:
+            print("\nMain Menu:")
+            print("1. Play Game (Money)")
+            print("2. Play Game (Tokens)")
+            print("3. Exchange Currency")
+            print("4. Exit")
+            choice = input("Enter your choice: ")
 
+            if choice == '1':
+                bet = float(input("Enter bet amount: $"))
+                play_game(bet, use_tokens=False)
+            elif choice == '2':
+                bet = int(input("Enter bet amount (in tokens): "))
+                play_game(bet, use_tokens=True)
+            elif choice == '3':
+                exchange_menu()
+            elif choice == '4':
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
+    # Start the game
+    main_menu()
+
+# Run the game
 selected_model()
