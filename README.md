@@ -19,7 +19,6 @@ This project is a comprehensive slot machine simulation system, including a core
 ## Requirements
 
 - Python 3.x
-- Pygame (for GUI)
 - DearPyGui (for Diagnostics Tool)
 
 ## Features
@@ -27,7 +26,6 @@ This project is a comprehensive slot machine simulation system, including a core
 - Multiple paylines and configurable reel symbols
 - Special features like wilds, scatters, and bonus rounds
 - Real-time logging of each spin for analysis
-- Interactive GUI with animations and sound effects
 - Comprehensive diagnostics tool for performance tracking
 
 Marco - marco.oj01@gmail.com
