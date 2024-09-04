@@ -4,9 +4,8 @@
     - [X] Add a progressive jackpot feature.
     - [X]Create bonus rounds or mini-games triggered by special symbol combinations.
 2. Expanded Wallet System:
-    - [ ] Add a currency exchange feature (eg., convert real money to game tokens).
-    - [ ] Implement different bet sizes and adjusts payouts accordingly.
-    - [ ] Create a daily bonus or reward system.
+    - [X] Add a currency exchange feature (eg., convert real money to game tokens).
+    - [X] Implement different bet sizes and adjusts payouts accordingly.
 3. Testing and balancing:
     - [ ] Develop a simulation to test the game's payout rate over many spins.
     - [ ] Fine-tune the probabilities and payouts to achieve desired return-to-player (RTP) rates.
