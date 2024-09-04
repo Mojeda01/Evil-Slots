@@ -4,6 +4,7 @@ from datetime import datetime
 from combination_list import combinations  # Import the combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
+import random
 
 # 1. Define game elements
 # SYMBOLS LIST
@@ -19,6 +20,10 @@ def selected_model():
         'Reel5': {s: 1 for s in sym},
     }
     
+    # Define special symbols and trigger conditions
+    BONUS_SYMBOL = "BONUS"
+    BONUS_TRIGGER = 3  # Number of bonus symbols needed to trigger the bonus game
+
     def spin_reels():
         """Simulates spinning of the reels using weighted random selection with numpy."""
         # Pre-calculate probabilities for each reel
@@ -32,6 +37,20 @@ def selected_model():
              for _ in range(3)]
             for i in range(5)
         ]
+
+    def check_bonus_trigger(symbols):
+        """Check if the bonus round is triggered based on the number of BONUS symbols."""
+        bonus_count = sum(symbol == BONUS_SYMBOL for reel in symbols for symbol in reel)
+        print(f"Debug: BONUS symbols count: {bonus_count}")
+        return bonus_count >= BONUS_TRIGGER
+
+    def play_bonus_game():
+        """Simulates a simple pick-a-box bonus game."""
+        print("Bonus Round Triggered!")
+        prizes = [50, 100, 200, 500, 1000]
+        chosen_prize = random.choice(prizes)
+        print(f"You won a bonus of {chosen_prize}!")
+        return chosen_prize
 
     def check_win(result):
         """Check if the spin result matches any winning combination across multiple paylines."""
@@ -93,11 +112,13 @@ def selected_model():
                 json.dump([log_entry], f, indent=4)
 
     def play_game(bet_amount=10):
+        """Main game function that simulates a single play."""
         current_balance = get_player_balance()
         current_jackpot = load_jackpot()
         print(f"Current balance: ${current_balance:.2f}")
         print(f"Current jackpot: ${current_jackpot:.2f}")
         
+        # Check if player has enough balance to place bet
         if current_balance < bet_amount:
             print("Not enough balance to place bet.")
             return
@@ -113,31 +134,37 @@ def selected_model():
             for row in range(3):
                 print(" | ".join(result[col][row] for col in range(5)))
 
-            if check_jackpot_win(result):
-                print(f"Congratulations! You've won the jackpot of ${new_jackpot:.2f}!")
-                add_winnings(new_jackpot)
-                reset_jackpot()
+            points, events, winning_paylines = check_win(result)
+            print(f'Points won: {points}')
+            
+            if winning_paylines:
+                print(f"Payline hit: {winning_paylines[0]}")
+                if len(winning_paylines) > 1:
+                    print("Additional winning paylines:")
+                    for payline in winning_paylines[1:]:
+                        print(f"- {payline}")
             else:
-                points, events, winning_paylines = check_win(result)
-                print(f'Points won: {points}')
-                
-                if winning_paylines:
-                    print(f"Payline hit: {winning_paylines[0]}")
-                    if len(winning_paylines) > 1:
-                        print("Additional winning paylines:")
-                        for payline in winning_paylines[1:]:
-                            print(f"- {payline}")
-                else:
-                    print("No paylines hit")
+                print("No paylines hit")
 
-                if events:
-                    print(f'Triggered events: {", ".join(events)}')
+            if events:
+                print(f'Triggered events: {", ".join(events)}')
 
-                winnings = points * 0.1  # Convert points to actual winnings
-                add_winnings(winnings)
-                
+            winnings = points * 0.1  # Convert points to actual winnings
+            
+            # Bonus points section
+            print("Bonus points:")
+            if check_bonus_trigger(result):
+                print("Bonus round triggered!")
+                bonus_win = play_bonus_game()
+                winnings += bonus_win
+                print(f"Congratulations! You won a bonus of ${bonus_win:.2f} in the Bonus Round!")
+            else:
+                print("No bonus round triggered.")
+
+            add_winnings(winnings)
+            
             new_balance = get_player_balance()
-            print(f"Winnings: ${winnings:.2f}")
+            print(f"Total winnings: ${winnings:.2f}")
             print(f"New balance: ${new_balance:.2f}")
 
             # Log the result
