@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from combination_list import combinations  # Import the combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance
+from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
 
 # 1. Define game elements
 # SYMBOLS LIST
@@ -93,14 +94,18 @@ def selected_model():
 
     def play_game(bet_amount=10):
         current_balance = get_player_balance()
+        current_jackpot = load_jackpot()
         print(f"Current balance: ${current_balance:.2f}")
+        print(f"Current jackpot: ${current_jackpot:.2f}")
         
         if current_balance < bet_amount:
             print("Not enough balance to place bet.")
             return
 
         if place_bet(bet_amount):
+            new_jackpot = increment_jackpot(bet_amount)
             print(f"Placing bet: ${bet_amount:.2f}")
+            print(f"Jackpot increased to: ${new_jackpot:.2f}")
             print("Spinning the reels...")
             result = spin_reels()
             
@@ -108,24 +113,29 @@ def selected_model():
             for row in range(3):
                 print(" | ".join(result[col][row] for col in range(5)))
 
-            points, events, winning_paylines = check_win(result)
-            print(f'Points won: {points}')
-            
-            # Add the new line to show which payline was hit
-            if winning_paylines:
-                print(f"Payline hit: {winning_paylines[0]}")  # Show the first winning payline
-                if len(winning_paylines) > 1:
-                    print("Additional winning paylines:")
-                    for payline in winning_paylines[1:]:
-                        print(f"- {payline}")
+            if check_jackpot_win(result):
+                print(f"Congratulations! You've won the jackpot of ${new_jackpot:.2f}!")
+                add_winnings(new_jackpot)
+                reset_jackpot()
             else:
-                print("No paylines hit")
+                points, events, winning_paylines = check_win(result)
+                print(f'Points won: {points}')
+                
+                if winning_paylines:
+                    print(f"Payline hit: {winning_paylines[0]}")
+                    if len(winning_paylines) > 1:
+                        print("Additional winning paylines:")
+                        for payline in winning_paylines[1:]:
+                            print(f"- {payline}")
+                else:
+                    print("No paylines hit")
 
-            if events:
-                print(f'Triggered events: {", ".join(events)}')
+                if events:
+                    print(f'Triggered events: {", ".join(events)}')
 
-            winnings = points * 0.1  # Convert points to actual winnings
-            add_winnings(winnings)
+                winnings = points * 0.1  # Convert points to actual winnings
+                add_winnings(winnings)
+                
             new_balance = get_player_balance()
             print(f"Winnings: ${winnings:.2f}")
             print(f"New balance: ${new_balance:.2f}")

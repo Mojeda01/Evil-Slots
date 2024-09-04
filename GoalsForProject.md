@@ -1,7 +1,7 @@
 # Goals for Project
 1. Game Mechanics:
-    - [ ] Implement multiple paylines (e.g., diagonal or zigzag patterns).
-    - [ ] Add a progressive jackpot feature.
+    - [X] Implement multiple paylines (e.g., diagonal or zigzag patterns).
+    - [X] Add a progressive jackpot feature.
     - [ ]Create bonus rounds or mini-games triggered by special symbol combinations.
 2. Expanded Wallet System:
     - [ ] Add a currency exchange feature (eg., convert real money to game tokens).
