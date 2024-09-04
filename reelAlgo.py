@@ -25,28 +25,50 @@ def selected_model():
             reel_name: np.array(list(reel.values())) / sum(reel.values())
             for reel_name, reel in reels.items()
         }
-        # Use list comprehension for more concise code
+        # Generate 15 symbols (3 rows x 5 columns)
         return [
-            np.random.choice(list(reel.keys()), p=reel_probabilities[reel_name])
-            for reel_name, reel in reels.items()
+            [np.random.choice(list(reels[f'Reel{i+1}'].keys()), p=reel_probabilities[f'Reel{i+1}'])
+             for _ in range(3)]
+            for i in range(5)
         ]
-    876u
+
     def check_win(result):
-        """Check if the spin result matches any winning combination."""
+        """Check if the spin result matches any winning combination across multiple paylines."""
         total_points = 0
         triggered_events = []
+        winning_paylines = []
+        
+        # Define paylines (indices of symbols to check)
+        paylines = [
+            [(0,0), (1,0), (2,0), (3,0), (4,0)],  # Horizontal top
+            [(0,1), (1,1), (2,1), (3,1), (4,1)],  # Horizontal middle
+            [(0,2), (1,2), (2,2), (3,2), (4,2)],  # Horizontal bottom
+            [(0,0), (1,1), (2,2), (3,1), (4,0)],  # V-shape
+            [(0,2), (1,1), (2,0), (3,1), (4,2)],  # Inverted V-shape
+            [(0,0), (1,2), (2,1), (3,2), (4,0)],  # W-shape
+            [(0,2), (1,0), (2,1), (3,0), (4,2)]   # M-shape
+        ]
 
-        for combo in combinations:
-            matches = all(
-                symbol == combo['symbols'][i] or combo['symbols'][i] == '*'
-                for i, symbol in enumerate(result)
-            )
-            if matches:
-                total_points += combo['points']
-                if 'trigger' in combo:
-                    triggered_events.append(combo['trigger'])
+        payline_names = [
+            "Horizontal top", "Horizontal middle", "Horizontal bottom",
+            "V-shape", "Inverted V-shape", "W-shape", "M-shape"
+        ]
 
-        return total_points, triggered_events
+        for i, payline in enumerate(paylines):
+            line_result = [result[x][y] for x, y in payline]
+            
+            for combo in combinations:
+                matches = all(
+                    symbol == combo['symbols'][i] or combo['symbols'][i] == '*'
+                    for i, symbol in enumerate(line_result)
+                )
+                if matches:
+                    total_points += combo['points']
+                    winning_paylines.append(payline_names[i])
+                    if 'trigger' in combo:
+                        triggered_events.append(combo['trigger'])
+
+        return total_points, triggered_events, winning_paylines
 
     def log_result(result, bet_amount, points, winnings, balance):
         """Log the game result to a JSON file."""
@@ -81,10 +103,24 @@ def selected_model():
             print(f"Placing bet: ${bet_amount:.2f}")
             print("Spinning the reels...")
             result = spin_reels()
-            print(f'Result: {" | ".join(result)}')
+            
+            # Display result as a 3x5 grid
+            for row in range(3):
+                print(" | ".join(result[col][row] for col in range(5)))
 
-            points, events = check_win(result)
+            points, events, winning_paylines = check_win(result)
             print(f'Points won: {points}')
+            
+            # Add the new line to show which payline was hit
+            if winning_paylines:
+                print(f"Payline hit: {winning_paylines[0]}")  # Show the first winning payline
+                if len(winning_paylines) > 1:
+                    print("Additional winning paylines:")
+                    for payline in winning_paylines[1:]:
+                        print(f"- {payline}")
+            else:
+                print("No paylines hit")
+
             if events:
                 print(f'Triggered events: {", ".join(events)}')
 
