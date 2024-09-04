@@ -7,8 +7,8 @@
     - [X] Add a currency exchange feature (eg., convert real money to game tokens).
     - [X] Implement different bet sizes and adjusts payouts accordingly.
 3. Testing and balancing:
-    - [ ] Develop a simulation to test the game's payout rate over many spins.
-    - [ ] Fine-tune the probabilities and payouts to achieve desired return-to-player (RTP) rates.
+    - [X] Develop a simulation to test the game's payout rate over many spins.
+    - [X] Fine-tune the probabilities and payouts to achieve desired return-to-player (RTP) rates.
 4. Backend Development:
     - [ ] Create a server to handle player accounts and transactions securely.
     - [ ] Implement a database to store player data and game statistics.
