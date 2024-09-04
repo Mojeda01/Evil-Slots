@@ -45,12 +45,40 @@ def selected_model():
         return bonus_count >= BONUS_TRIGGER
 
     def play_bonus_game():
-        """Simulates a simple pick-a-box bonus game."""
+        """Simulates a more balanced pick-a-box bonus game."""
         print("Bonus Round Triggered!")
-        prizes = [50, 100, 200, 500, 1000]
-        chosen_prize = random.choice(prizes)
-        print(f"You won a bonus of {chosen_prize}!")
-        return chosen_prize
+        
+        # Define prizes with their probabilities
+        prizes = [
+            (0, 30),     # 30% chance of winning nothing
+            (10, 25),    # 25% chance of winning 10
+            (20, 20),    # 20% chance of winning 20
+            (50, 15),    # 15% chance of winning 50
+            (100, 7),    # 7% chance of winning 100
+            (200, 2),    # 2% chance of winning 200
+            (500, 1)     # 1% chance of winning 500
+        ]
+        
+        # Calculate the total weight
+        total_weight = sum(weight for _, weight in prizes)
+        
+        # Generate a random number
+        r = random.randint(1, total_weight)
+        
+        # Select the prize based on the random number
+        current_weight = 0
+        for prize, weight in prizes:
+            current_weight += weight
+            if r <= current_weight:
+                if prize == 0:
+                    print("Sorry, no bonus win this time!")
+                else:
+                    print(f"Congratulations! You won a bonus of ${prize}!")
+                return prize
+
+        # This should never happen, but just in case
+        print("An error occurred in the bonus game.")
+        return 0
 
     def check_win(result):
         """Check if the spin result matches any winning combination across multiple paylines."""
@@ -90,15 +118,19 @@ def selected_model():
 
         return total_points, triggered_events, winning_paylines
 
-    def log_result(result, bet_amount, points, winnings, balance):
-        """Log the game result to a JSON file."""
+    def log_result(result, bet_amount, points, winnings, balance, jackpot_win=0, bonus_win=0, current_jackpot=0):
+        """Log the game result to a JSON file, including jackpot and bonus information."""
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "result": result,
             "bet_amount": bet_amount,
             "points_won": points,
-            "winnings": winnings,
-            "balance_after": balance
+            "regular_winnings": winnings - jackpot_win - bonus_win,
+            "jackpot_win": jackpot_win,
+            "bonus_win": bonus_win,
+            "total_winnings": winnings,
+            "balance_after": balance,
+            "current_jackpot": current_jackpot
         }
 
         try:
@@ -156,8 +188,11 @@ def selected_model():
             if check_bonus_trigger(result):
                 print("Bonus round triggered!")
                 bonus_win = play_bonus_game()
-                winnings += bonus_win
-                print(f"Congratulations! You won a bonus of ${bonus_win:.2f} in the Bonus Round!")
+                if bonus_win > 0:
+                    winnings += bonus_win
+                    print(f"You won ${bonus_win:.2f} in the Bonus Round!")
+                else:
+                    print("No additional winnings from the Bonus Round.")
             else:
                 print("No bonus round triggered.")
 
@@ -168,7 +203,7 @@ def selected_model():
             print(f"New balance: ${new_balance:.2f}")
 
             # Log the result
-            log_result(result, bet_amount, points, winnings, new_balance)
+            log_result(result, bet_amount, points, winnings, new_balance, jackpot_win=0, bonus_win=0, current_jackpot=current_jackpot)
         else:
             print("Error placing bet. Please try again.")
 
