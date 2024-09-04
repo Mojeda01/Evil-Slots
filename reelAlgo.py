@@ -30,7 +30,7 @@ def selected_model():
             np.random.choice(list(reel.keys()), p=reel_probabilities[reel_name])
             for reel_name, reel in reels.items()
         ]
-    
+    876u
     def check_win(result):
         """Check if the spin result matches any winning combination."""
         total_points = 0
