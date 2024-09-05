@@ -3,6 +3,7 @@ import dearpygui.dearpygui as dpg
 import threading
 import time
 import os
+from config_manager import get_reel_probabilities, update_probabilities
 
 last_modified_time = 0
 update_needed = threading.Event()
@@ -124,6 +125,14 @@ def check_file_changes():
             pass
         time.sleep(0.1)  # Check every 100ms for more responsiveness
 
+def create_reel_probability_window():
+    with dpg.window(label="Reel Probabilities", width=400, height=300):
+        dpg.add_text("Current Reel Probabilities")
+        for reel, symbols in get_reel_probabilities().items():
+            with dpg.collapsing_header(label=reel):
+                for symbol, probability in symbols.items():
+                    dpg.add_text(f"{symbol}: {probability}")
+
 def main():
     dpg.create_context()
 
@@ -152,6 +161,8 @@ def main():
                 create_plot("Win Frequency", "Spins", "Win (1) / Loss (0)", "win_frequency_chart", series_type="stem")
                 create_plot("RTP Over Time", "Spins", "RTP (%)", "rtp_over_time_chart")
                 create_plot("Bonus Trigger Frequency", "Spins", "Bonus Triggered", "bonus_trigger_chart", series_type="stem")
+        
+        dpg.add_button(label="Show Reel Probabilities", callback=create_reel_probability_window)
 
     dpg.create_viewport(title="Slot Machine Diagnostics", width=1200, height=800)
     dpg.setup_dearpygui()
