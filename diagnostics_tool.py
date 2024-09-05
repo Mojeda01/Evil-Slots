@@ -125,13 +125,57 @@ def check_file_changes():
             pass
         time.sleep(0.1)  # Check every 100ms for more responsiveness
 
+def save_probabilities(sender, app_data, user_data):
+    new_probabilities = {}
+    for reel, symbols in user_data.items():
+        new_probabilities[reel] = {symbol: dpg.get_value(tag) for symbol, tag in symbols.items()}
+    update_probabilities(new_probabilities)
+    dpg.set_value("save_status", "Probabilities saved!")
+
+def apply_to_all_reels(sender, app_data, user_data):
+    source_reel = dpg.get_value("source_reel_combo")
+    slider_tags = {reel: {symbol: f"{reel}_{symbol}_slider" for symbol in get_reel_probabilities()[reel]} for reel in get_reel_probabilities()}
+    
+    source_probabilities = {symbol: dpg.get_value(slider_tags[source_reel][symbol]) for symbol in slider_tags[source_reel]}
+    
+    for reel in slider_tags:
+        if reel != source_reel:
+            for symbol, probability in source_probabilities.items():
+                dpg.set_value(slider_tags[reel][symbol], probability)
+    
+    dpg.set_value("apply_status", f"Applied {source_reel} probabilities to all reels!")
+
+def toggle_probabilities_window():
+    if dpg.does_item_exist("Reel Probabilities"):
+        dpg.delete_item("Reel Probabilities")
+    else:
+        create_reel_probability_window()
+
 def create_reel_probability_window():
-    with dpg.window(label="Reel Probabilities", width=400, height=300):
-        dpg.add_text("Current Reel Probabilities")
-        for reel, symbols in get_reel_probabilities().items():
+    with dpg.window(label="Reel Probabilities", width=400, height=500, tag="Reel Probabilities"):
+        dpg.add_text("Adjust Reel Probabilities")
+        
+        # Add a combo box to select the source reel
+        dpg.add_combo(("Reel1", "Reel2", "Reel3", "Reel4", "Reel5"), label="Source Reel", default_value="Reel1", tag="source_reel_combo")
+        
+        # Add a button to apply the selected reel's probabilities to all reels
+        dpg.add_button(label="Apply to All Reels", callback=apply_to_all_reels, tag="apply_to_all_button")
+        
+        dpg.add_text("", tag="apply_status")
+        
+        slider_tags = {}
+        current_probabilities = get_reel_probabilities()
+        for reel, symbols in current_probabilities.items():
             with dpg.collapsing_header(label=reel):
+                reel_sliders = {}
                 for symbol, probability in symbols.items():
-                    dpg.add_text(f"{symbol}: {probability}")
+                    tag = f"{reel}_{symbol}_slider"
+                    dpg.add_slider_float(label=symbol, min_value=0, max_value=1, default_value=probability, tag=tag)
+                    reel_sliders[symbol] = tag
+                slider_tags[reel] = reel_sliders
+        
+        dpg.add_button(label="Save Probabilities", callback=save_probabilities, user_data=slider_tags)
+        dpg.add_text("", tag="save_status")
 
 def main():
     dpg.create_context()
@@ -162,7 +206,7 @@ def main():
                 create_plot("RTP Over Time", "Spins", "RTP (%)", "rtp_over_time_chart")
                 create_plot("Bonus Trigger Frequency", "Spins", "Bonus Triggered", "bonus_trigger_chart", series_type="stem")
         
-        dpg.add_button(label="Show Reel Probabilities", callback=create_reel_probability_window)
+        dpg.add_button(label="Probabilities", callback=toggle_probabilities_window)
 
     dpg.create_viewport(title="Slot Machine Diagnostics", width=1200, height=800)
     dpg.setup_dearpygui()

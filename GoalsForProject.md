@@ -10,7 +10,7 @@
     - [X] Develop a simulation to test the game's payout rate over many spins.
     - [X] Fine-tune the probabilities and payouts to achieve desired return-to-player (RTP) rates.
 4. ReelAlgo.py - Make it more customizable:
-    - [ ] Option to control the probability of each symbol on each reel.
+    - [X] Option to control the probability of each symbol on each reel.
     - [ ] Option to control the payout for each symbol combination.
     - [ ] Option to control the length of the game (number of spins).
 4. Backend Development - Added more points to this section below:

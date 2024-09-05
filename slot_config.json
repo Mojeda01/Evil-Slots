@@ -1,59 +1,59 @@
 {
     "reels": {
         "Reel1": {
-            "CHER": 1,
-            "ONIO": 1,
-            "CLOC": 1,
-            "STAR": 1,
-            "DIAMN": 1,
-            "WILD": 1,
-            "BONUS": 1,
-            "SCAT": 1,
-            "JACKP": 1
+            "CHER": 1.0,
+            "ONIO": 1.0,
+            "CLOC": 1.0,
+            "STAR": 1.0,
+            "DIAMN": 1.0,
+            "WILD": 1.0,
+            "BONUS": 1.0,
+            "SCAT": 1.0,
+            "JACKP": 1.0
         },
         "Reel2": {
-            "CHER": 1,
-            "ONIO": 1,
-            "CLOC": 1,
-            "STAR": 1,
-            "DIAMN": 1,
-            "WILD": 1,
-            "BONUS": 1,
-            "SCAT": 1,
-            "JACKP": 1
+            "CHER": 1.0,
+            "ONIO": 1.0,
+            "CLOC": 1.0,
+            "STAR": 1.0,
+            "DIAMN": 1.0,
+            "WILD": 1.0,
+            "BONUS": 1.0,
+            "SCAT": 1.0,
+            "JACKP": 1.0
         },
         "Reel3": {
-            "CHER": 1,
-            "ONIO": 1,
-            "CLOC": 1,
-            "STAR": 1,
-            "DIAMN": 1,
-            "WILD": 1,
-            "BONUS": 1,
-            "SCAT": 1,
-            "JACKP": 1
+            "CHER": 1.0,
+            "ONIO": 1.0,
+            "CLOC": 1.0,
+            "STAR": 1.0,
+            "DIAMN": 1.0,
+            "WILD": 1.0,
+            "BONUS": 1.0,
+            "SCAT": 1.0,
+            "JACKP": 1.0
         },
         "Reel4": {
-            "CHER": 1,
-            "ONIO": 1,
-            "CLOC": 1,
-            "STAR": 1,
-            "DIAMN": 1,
-            "WILD": 1,
-            "BONUS": 1,
-            "SCAT": 1,
-            "JACKP": 1
+            "CHER": 1.0,
+            "ONIO": 1.0,
+            "CLOC": 1.0,
+            "STAR": 1.0,
+            "DIAMN": 1.0,
+            "WILD": 1.0,
+            "BONUS": 1.0,
+            "SCAT": 1.0,
+            "JACKP": 1.0
         },
         "Reel5": {
-            "CHER": 1,
-            "ONIO": 1,
-            "CLOC": 1,
-            "STAR": 1,
-            "DIAMN": 1,
-            "WILD": 1,
-            "BONUS": 1,
-            "SCAT": 1,
-            "JACKP": 1
+            "CHER": 1.0,
+            "ONIO": 1.0,
+            "CLOC": 1.0,
+            "STAR": 1.0,
+            "DIAMN": 1.0,
+            "WILD": 1.0,
+            "BONUS": 1.0,
+            "SCAT": 1.0,
+            "JACKP": 1.0
         }
     }
 }
