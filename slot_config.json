@@ -1,0 +1,59 @@
+{
+    "reels": {
+        "Reel1": {
+            "CHER": 1,
+            "ONIO": 1,
+            "CLOC": 1,
+            "STAR": 1,
+            "DIAMN": 1,
+            "WILD": 1,
+            "BONUS": 1,
+            "SCAT": 1,
+            "JACKP": 1
+        },
+        "Reel2": {
+            "CHER": 1,
+            "ONIO": 1,
+            "CLOC": 1,
+            "STAR": 1,
+            "DIAMN": 1,
+            "WILD": 1,
+            "BONUS": 1,
+            "SCAT": 1,
+            "JACKP": 1
+        },
+        "Reel3": {
+            "CHER": 1,
+            "ONIO": 1,
+            "CLOC": 1,
+            "STAR": 1,
+            "DIAMN": 1,
+            "WILD": 1,
+            "BONUS": 1,
+            "SCAT": 1,
+            "JACKP": 1
+        },
+        "Reel4": {
+            "CHER": 1,
+            "ONIO": 1,
+            "CLOC": 1,
+            "STAR": 1,
+            "DIAMN": 1,
+            "WILD": 1,
+            "BONUS": 1,
+            "SCAT": 1,
+            "JACKP": 1
+        },
+        "Reel5": {
+            "CHER": 1,
+            "ONIO": 1,
+            "CLOC": 1,
+            "STAR": 1,
+            "DIAMN": 1,
+            "WILD": 1,
+            "BONUS": 1,
+            "SCAT": 1,
+            "JACKP": 1
+        }
+    }
+}
