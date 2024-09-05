@@ -13,7 +13,6 @@
     - [X] Option to control the probability of each symbol on each reel.
     - [ ] Option to control the payout for each symbol combination.
 5. AI and Machine Learning:
-    - [ ] Implement an AI opponent or helper for players.
     - [ ] Use machine learning to analyze player behavior and personalize the gaming experience.
 6. Backend Development - Added more points to this section below:
     - [ ] Create a server to handle player accounts and transactions securely.
