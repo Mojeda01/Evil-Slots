@@ -27,8 +27,8 @@
     - [ ] Research and comply with relevant gaming regulations in your target market.
 ***
 # Building out goals more specifically
-## 4. Backend Development
-### 4.1 Implement a database to store player data and game statistics
+## 5. Backend Development
+### 5.1 Implement a database to store player data and game statistics
 - [ ] Choose a database system (e.g., PostgreSQL for relational data, MongoDB for flexible schema)
 - [ ] Design database schema
   - [ ] Player table (id, username, email, password_hash, balance, created_at, last_login)
@@ -40,7 +40,7 @@
 - [ ] Create database backup and recovery procedures
 - [ ] Implement data encryption for sensitive information
 
-### 4.2 Security Measures
+### 5.2 Security Measures
 - [ ] Implement input validation and sanitization to prevent SQL injection and XSS attacks
 - [ ] Set up proper error handling and logging
 - [ ] Conduct regular security audits and penetration testing
@@ -48,19 +48,19 @@
 - [ ] Use secure password hashing (e.g., bcrypt)
 - [ ] Implement rate limiting and request validation to prevent abuse
 
-### 4.3 Monitoring and Maintenance
+### 5.3 Monitoring and Maintenance
 - [ ] Set up database monitoring tools
 - [ ] Implement automated alerts for system issues
 - [ ] Create a plan for regular software updates and security patches
 - [ ] Set up database indexing for optimized query performance
 - [ ] Implement caching mechanisms (e.g., Redis) for frequently accessed data
 
-### 4.4 Compliance
+### 5.4 Compliance
 - [ ] Ensure GDPR compliance for handling European users' data
 - [ ] Implement data retention and deletion policies
 - [ ] Create privacy policy and terms of service documents
 
-### 4.5 Server-side Framework (if project scope expands)
+### 5.5 Server-side Framework (if project scope expands)
 - [ ] Choose a server-side framework (e.g., Flask or Django for Python)
 - [ ] Set up a secure HTTPS server with SSL/TLS encryption
 - [ ] Implement user authentication and authorization system

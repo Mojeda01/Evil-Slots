@@ -4,20 +4,15 @@ from datetime import datetime
 from combination_list import combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance, convert_to_tokens, convert_to_money, deposit_to_player, withdraw_to_bank
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
+from config_manager import get_reel_probabilities
 import random
 
 # SYMBOLS LIST
 sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']
 
 def selected_model():
-    # Reels configuration: Defining probabilities for each symbol on each reel
-    reels = {
-        'Reel1': {s: 1 for s in sym},  # Equal probability for simplicity
-        'Reel2': {s: 1 for s in sym},
-        'Reel3': {s: 1 for s in sym},
-        'Reel4': {s: 1 for s in sym},
-        'Reel5': {s: 1 for s in sym},
-    }
+    # Load reel configuration from config_manager
+    reels = get_reel_probabilities()
     
     # Define special symbols and trigger conditions
     BONUS_SYMBOL = "BONUS"
