@@ -72,6 +72,32 @@ This module manages the jackpot functionality for the slot machine game. It hand
 
 The jackpot value is stored in a JSON file and increases by a configurable percentage of each bet placed.
 
+### Advanced Random Number Generator (advanced_rng.py)
+
+This module implements a sophisticated random number generator specifically designed for the slot machine simulation. It uses the Mersenne Twister algorithm with enhanced seeding to provide high-quality randomness while maintaining the desired probability distributions for each reel.
+
+Key features include:
+
+- **SlotMachineRNG Class**: Encapsulates the random number generation logic for the slot machine.
+  - Uses Python's implementation of the Mersenne Twister algorithm.
+  - Implements a robust seeding mechanism using multiple entropy sources.
+
+- **Enhanced Seeding**: 
+  - Combines current time (nanosecond precision), process ID, and random bytes from the operating system.
+  - Uses SHA-256 hashing to create a 256-bit seed, ensuring high-quality initial randomness.
+
+- **Configurable Reel Generation**: 
+  - Generates spin results based on the reel configuration provided in `slot_config.json`.
+  - Maintains accurate symbol probabilities as defined in the configuration.
+
+- **Symbol Mapping**: 
+  - Implements a weighted random selection algorithm to map random numbers to symbols based on their defined probabilities.
+
+- **Distribution Testing**: 
+  - Includes a `test_distribution` function to verify the accuracy of symbol probabilities over a large number of spins.
+
+This advanced RNG system ensures that the slot machine simulation maintains fairness and unpredictability while adhering to the configured probabilities for each symbol on each reel. It provides a solid foundation for realistic and statistically accurate slot machine behavior.
+
 ## Usage
 
 1. Run `reelAlgo.py` to play the slot machine game.
