@@ -10,16 +10,22 @@ This script implements the core logic of the slot machine game. Key features inc
 
 - Reel spinning mechanism with configurable symbol probabilities
 - Multiple paylines for win calculation
-- Bonus game functionality
+- Bonus game functionality with adjustable trigger frequency
 - Currency and token management
 - Jackpot system integration
-- Logging of game results
+- Logging of game results for analysis
+- Implemented house edge for long-term game balance
+- Maximum bet limit to prevent excessive wagering
+- Enhanced win calculation considering bet amount and house edge
+- Improved random selection of symbols based on configured probabilities
+- Removed inaccurate in-game RTP calculation for more realistic gameplay
+- Updated main menu for streamlined user interaction
 
-The script provides a text-based interface for playing the game, allowing users to place bets, spin the reels, and participate in bonus rounds.
+The script provides a text-based interface for playing the game, allowing users to place bets, spin the reels, and participate in bonus rounds. It now offers a more balanced and realistic slot machine experience with improved game economics.
 
 ### 2. Diagnostics Tool (diagnostics_tool.py)
 
-This tool provides real-time analysis, visualization of the slot machine's performance, and control over game probabilities. Features include:
+This tool provides real-time analysis, visualization of the slot machine's performance, and control over game probabilities and payouts. Features include:
 
 - Automatic updates based on changes in the log file
 - Display of key statistics (total spins, winnings, average win, RTP)
@@ -37,8 +43,12 @@ This tool provides real-time analysis, visualization of the slot machine's perfo
   - View and adjust symbol probabilities for each reel
   - Apply probability settings from one reel to all reels for quick configuration
   - Save updated probabilities to directly affect the game's behavior
+- Payout Control:
+  - View and adjust symbol payouts
+  - Modify payouts for individual symbols or combinations
+  - Save updated payouts to immediately impact game economics
 
-The tool uses DearPyGui for creating an interactive graphical interface with multiple charts arranged in a grid layout and intuitive controls for probability adjustment.
+The tool uses DearPyGui for creating an interactive graphical interface with multiple charts arranged in a grid layout and intuitive controls for probability and payout adjustments.
 
 ### 3. Jackpot Manager (jackpot_manager.py)
 
