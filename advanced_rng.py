@@ -3,6 +3,8 @@ import time
 import os
 import hashlib
 import json
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
 
 class SlotMachineRNG:
     """
@@ -38,6 +40,29 @@ class SlotMachineRNG:
         # Seed the random number generator
         self.generator.seed(seed)
 
+    def _generate_encryption_key(self):
+        """Generate a new encryption key for each spin."""
+        return os.urandom(32)  # 256-bit key for AES
+
+    def _encrypt_number(self, number, key):
+        """Encrypt a number using AES."""
+        backend = default_backend()
+        iv = os.urandom(16)
+        cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=backend)
+        encryptor = cipher.encryptor()
+        encrypted = encryptor.update(str(number).encode()) + encryptor.finalize()
+        return iv + encrypted
+
+    def _decrypt_number(self, encrypted, key):
+        """Decrypt a number using AES."""
+        backend = default_backend()
+        iv = encrypted[:16]
+        ciphertext = encrypted[16:]
+        cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=backend)
+        decryptor = cipher.decryptor()
+        decrypted = decryptor.update(ciphertext) + decryptor.finalize()
+        return int(decrypted.decode())
+
     def generate_spin(self, reel_config):
         """
         Generate a complete spin result for all reels.
@@ -46,26 +71,30 @@ class SlotMachineRNG:
         :return: A list of lists, each inner list representing the symbols on one reel
         """
         result = []
+        encryption_key = self._generate_encryption_key()
         for reel in reel_config.values():
             symbols = list(reel.keys())
             weights = list(reel.values())
-            reel_result = self._generate_reel_spin(symbols, weights)
+            reel_result = self._generate_reel_spin(symbols, weights, encryption_key)
             result.append(reel_result)
         return result
 
-    def _generate_reel_spin(self, symbols, weights):
+    def _generate_reel_spin(self, symbols, weights, encryption_key):
         """
         Generate a spin result for a single reel.
         
         :param symbols: List of symbols on the reel
         :param weights: Corresponding weights (probabilities) for each symbol
+        :param encryption_key: Encryption key for the spin
         :return: A list of 3 symbols representing the visible part of the reel
         """
         total_weight = sum(weights)
         reel_result = []
         for _ in range(3):  # Generate 3 symbols per reel
             number = self.generator.randint(1, total_weight)
-            symbol = self._map_number_to_symbol(number, symbols, weights)
+            encrypted_number = self._encrypt_number(number, encryption_key)
+            decrypted_number = self._decrypt_number(encrypted_number, encryption_key)
+            symbol = self._map_number_to_symbol(decrypted_number, symbols, weights)
             reel_result.append(symbol)
         return reel_result
 
