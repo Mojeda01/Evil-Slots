@@ -29,7 +29,7 @@ The script provides a text-based interface for playing the game, allowing users 
 
 ### 2. Diagnostics Tool (diagnostics_tool.py)
 <p align="center">
-  <img src="diagnostics.png" alt="Slot Machine Simulation Project Icon" width="200">
+  <img src="diagnostics.png" alt="Slot Machine Simulation Project Icon" width="800">
 </p>
 This tool provides real-time analysis, visualization of the slot machine's performance, and control over game probabilities and payouts. Features include:
 
