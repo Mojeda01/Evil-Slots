@@ -55,3 +55,10 @@ def get_reel_probabilities():
 def get_symbol_payouts():
     config = load_config()
     return config.get('symbol_payouts', DEFAULT_CONFIG['symbol_payouts'])
+
+def update_symbol_payouts(new_payouts):
+    config = load_config()
+    config['symbol_payouts'] = new_payouts
+    save_config(config)
+
+__all__ = ['get_reel_probabilities', 'update_probabilities', 'get_symbol_payouts', 'update_symbol_payouts']

@@ -3,12 +3,13 @@ import dearpygui.dearpygui as dpg
 import threading
 import time
 import os
-from config_manager import get_reel_probabilities, update_probabilities
+from config_manager import get_reel_probabilities, update_probabilities, get_symbol_payouts, update_symbol_payouts
 
 last_modified_time = 0
 update_needed = threading.Event()
 
 def load_logs():
+    """Loads the game logs from the logs.json file."""
     try:
         with open('logs.json', 'r') as f:
             return json.load(f)
@@ -16,6 +17,7 @@ def load_logs():
         return []
 
 def calculate_stats(logs):
+    """Calculates various statistics based on the game logs."""
     # If there are no logs, return default values
     if not logs:
         return {"total_spins": 0, "total_winnings": 0, "average_win": 0, "rtp": 0, "cumulative_avg_wins": []}
@@ -50,6 +52,7 @@ def calculate_stats(logs):
     }
 
 def update_stats():
+    """Updates the statistics display in the diagnostics tool."""
     dpg.set_value("status", "Updating...")
     logs = load_logs()
     stats = calculate_stats(logs)
@@ -123,6 +126,7 @@ def update_stats():
     dpg.set_value("status", "Up to date")
 
 def check_file_changes():
+    """Checks for changes in the logs.json file and triggers an update if needed."""
     global last_modified_time
     while True:
         try:
@@ -141,6 +145,7 @@ def check_file_changes():
         time.sleep(0.1)  # Check every 100ms for more responsiveness
 
 def save_probabilities(sender, app_data, user_data):
+    """Saves the new reel probabilities to the configuration."""
     # Initialize a dictionary to store new probabilities
     new_probabilities = {}
     # Iterate through each reel and its symbols
@@ -153,6 +158,7 @@ def save_probabilities(sender, app_data, user_data):
     dpg.set_value("save_status", "Probabilities saved!")
 
 def apply_to_all_reels(sender, app_data, user_data):
+    """Applies the probabilities from one reel to all other reels."""
     # Get the selected source reel from the combo box
     source_reel = dpg.get_value("source_reel_combo")
     # Create a dictionary of slider tags for each reel and symbol
@@ -171,6 +177,7 @@ def apply_to_all_reels(sender, app_data, user_data):
     dpg.set_value("apply_status", f"Applied {source_reel} probabilities to all reels!")
 
 def toggle_probabilities_window():
+    """Toggles the visibility of the Reel Probabilities window."""
     # Check if the Reel Probabilities window exists
     if dpg.does_item_exist("Reel Probabilities"):
         # If it exists, delete it (close the window)
@@ -180,6 +187,7 @@ def toggle_probabilities_window():
         create_reel_probability_window()
 
 def create_reel_probability_window():
+    """Creates a new window for adjusting reel probabilities."""
     # Create a new window for adjusting reel probabilities
     with dpg.window(label="Reel Probabilities", width=400, height=500, tag="Reel Probabilities"):
         dpg.add_text("Adjust Reel Probabilities")
@@ -216,6 +224,43 @@ def create_reel_probability_window():
         # Add a text element to display the status of the save operation
         dpg.add_text("", tag="save_status")
 
+def create_symbol_payout_window():
+    """Creates a new window for adjusting symbol payouts."""
+    if dpg.does_item_exist("Symbol Payouts"):
+        dpg.delete_item("Symbol Payouts")
+    
+    with dpg.window(label="Symbol Payouts", width=300, height=400, tag="Symbol Payouts"):
+        current_payouts = get_symbol_payouts()
+        input_tags = {}
+        
+        # Create input fields for each symbol's payout
+        for symbol, payout in current_payouts.items():
+            tag = f"{symbol}_payout_input"
+            dpg.add_input_float(label=symbol, default_value=payout, tag=tag)
+            input_tags[symbol] = tag
+        
+        # Add buttons for saving and resetting payouts
+        dpg.add_button(label="Save Payouts", callback=save_payouts, user_data=input_tags)
+        dpg.add_button(label="Reset to Default", callback=reset_payouts, user_data=input_tags)
+        dpg.add_text("", tag="payout_status")
+
+def save_payouts(sender, app_data, user_data):
+    """Saves the new payout values to the configuration."""
+    new_payouts = {symbol: dpg.get_value(tag) for symbol, tag in user_data.items()}
+    update_symbol_payouts(new_payouts)
+    dpg.set_value("payout_status", "Payouts updated successfully!")
+
+def reset_payouts(sender, app_data, user_data):
+    """Resets the payout values to their defaults."""
+    default_payouts = {
+        'CHER': 5, 'ONIO': 7, 'CLOC': 10, 'STAR': 15, 'DIAMN': 20,
+        'WILD': 25, 'BONUS': 30, 'SCAT': 35, 'JACKP': 50
+    }
+    for symbol, tag in user_data.items():
+        dpg.set_value(tag, default_payouts[symbol])
+    update_symbol_payouts(default_payouts)
+    dpg.set_value("payout_status", "Payouts reset to default!")
+
 def main():
     dpg.create_context()
 
@@ -246,6 +291,7 @@ def main():
                 create_plot("Bonus Trigger Frequency", "Spins", "Bonus Triggered", "bonus_trigger_chart", series_type="stem")
         
         dpg.add_button(label="Probabilities", callback=toggle_probabilities_window)
+        dpg.add_button(label="Adjust Symbol Payouts", callback=create_symbol_payout_window)
 
     dpg.create_viewport(title="Slot Machine Diagnostics", width=1200, height=800)
     dpg.setup_dearpygui()
@@ -267,6 +313,7 @@ def main():
     dpg.destroy_context()
 
 def create_plot(label, x_label, y_label, tag, height=200, width=380, series_type="line"):
+    """Creates a new plot with the given label, height, and width."""
     # Create a plot with the given label, height, and width
     with dpg.plot(label=label, height=height, width=width):
         # Add a legend to the plot

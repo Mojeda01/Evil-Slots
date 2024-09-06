@@ -55,5 +55,16 @@
             "SCAT": 1.0,
             "JACKP": 1.0
         }
+    },
+    "symbol_payouts": {
+        "CHER": 5,
+        "ONIO": 7,
+        "CLOC": 10,
+        "STAR": 15,
+        "DIAMN": 20,
+        "WILD": 25,
+        "BONUS": 30,
+        "SCAT": 35,
+        "JACKP": 50
     }
 }
