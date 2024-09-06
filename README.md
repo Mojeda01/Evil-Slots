@@ -1,10 +1,10 @@
-# Slot Machine Simulation Project
+# Slot Machine Algorithm Project
 
 <p align="center">
   <img src="icon.png" alt="Slot Machine Simulation Project Icon" width="500">
 </p>
 
-This project simulates a slot machine game with a graphical user interface and a diagnostics tool for performance analysis and game configuration.
+This project implements a slot machine reel algorithm without a graphical user interface. It includes supportive diagnostics tools to manipulate the algorithm's probabilities. In theory, this algorithm can be integrated with an actual slots game, as it produces reel results that can be exported to other applications, such as a GUI. This allows for the possibility of a purely graphical slots game that derives its reel choices from this algorithm, as it performs calculations that can be outputted in various formats.
 
 ## Components
 
