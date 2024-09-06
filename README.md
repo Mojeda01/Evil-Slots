@@ -74,7 +74,7 @@ The jackpot value is stored in a JSON file and increases by a configurable perce
 
 ### Advanced Random Number Generator (advanced_rng.py)
 
-This module implements a sophisticated random number generator specifically designed for the slot machine simulation. It uses the Mersenne Twister algorithm with enhanced seeding to provide high-quality randomness while maintaining the desired probability distributions for each reel.
+This module implements a sophisticated random number generator specifically designed for the slot machine simulation. It uses the Mersenne Twister algorithm with enhanced seeding and AES encryption to provide high-quality, secure randomness while maintaining the desired probability distributions for each reel.
 
 Key features include:
 
@@ -86,6 +86,11 @@ Key features include:
   - Combines current time (nanosecond precision), process ID, and random bytes from the operating system.
   - Uses SHA-256 hashing to create a 256-bit seed, ensuring high-quality initial randomness.
 
+- **AES Encryption**:
+  - Generates a unique 256-bit encryption key for each spin.
+  - Encrypts random numbers using AES before symbol selection.
+  - Decrypts numbers immediately before use, enhancing security without affecting probabilities.
+
 - **Configurable Reel Generation**: 
   - Generates spin results based on the reel configuration provided in `slot_config.json`.
   - Maintains accurate symbol probabilities as defined in the configuration.
@@ -96,7 +101,10 @@ Key features include:
 - **Distribution Testing**: 
   - Includes a `test_distribution` function to verify the accuracy of symbol probabilities over a large number of spins.
 
-This advanced RNG system ensures that the slot machine simulation maintains fairness and unpredictability while adhering to the configured probabilities for each symbol on each reel. It provides a solid foundation for realistic and statistically accurate slot machine behavior.
+This advanced RNG system ensures that the slot machine simulation maintains fairness and unpredictability while adhering to the configured probabilities for each symbol on each reel. The addition of AES encryption provides an extra layer of security, making it extremely difficult for potential attackers to predict or manipulate outcomes. This creates a solid foundation for a realistic, statistically accurate, and secure slot machine behavior.
+
+Dependencies:
+- cryptography library: Used for AES encryption and decryption.
 
 ## Usage
 
