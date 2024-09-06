@@ -152,29 +152,40 @@ def toggle_probabilities_window():
         create_reel_probability_window()
 
 def create_reel_probability_window():
+    # Create a new window for adjusting reel probabilities
     with dpg.window(label="Reel Probabilities", width=400, height=500, tag="Reel Probabilities"):
         dpg.add_text("Adjust Reel Probabilities")
         
-        # Add a combo box to select the source reel
+        # Add a combo box to select the source reel for copying probabilities
         dpg.add_combo(("Reel1", "Reel2", "Reel3", "Reel4", "Reel5"), label="Source Reel", default_value="Reel1", tag="source_reel_combo")
         
-        # Add a button to apply the selected reel's probabilities to all reels
+        # Add a button to apply the selected reel's probabilities to all other reels
         dpg.add_button(label="Apply to All Reels", callback=apply_to_all_reels, tag="apply_to_all_button")
         
+        # Add a text element to display the status of the "Apply to All" operation
         dpg.add_text("", tag="apply_status")
         
+        # Dictionary to store slider tags for each reel and symbol
         slider_tags = {}
+        # Get the current probabilities for all reels
         current_probabilities = get_reel_probabilities()
+        # Iterate through each reel and its symbols
         for reel, symbols in current_probabilities.items():
+            # Create a collapsing header for each reel
             with dpg.collapsing_header(label=reel):
                 reel_sliders = {}
+                # Create a slider for each symbol in the reel
                 for symbol, probability in symbols.items():
                     tag = f"{reel}_{symbol}_slider"
+                    # Add a float slider with range 0-1 for probability adjustment
                     dpg.add_slider_float(label=symbol, min_value=0, max_value=1, default_value=probability, tag=tag)
                     reel_sliders[symbol] = tag
+                # Store the sliders for this reel in the slider_tags dictionary
                 slider_tags[reel] = reel_sliders
         
+        # Add a button to save the adjusted probabilities
         dpg.add_button(label="Save Probabilities", callback=save_probabilities, user_data=slider_tags)
+        # Add a text element to display the status of the save operation
         dpg.add_text("", tag="save_status")
 
 def main():
