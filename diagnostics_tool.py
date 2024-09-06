@@ -16,22 +16,31 @@ def load_logs():
         return []
 
 def calculate_stats(logs):
+    # If there are no logs, return default values
     if not logs:
         return {"total_spins": 0, "total_winnings": 0, "average_win": 0, "rtp": 0, "cumulative_avg_wins": []}
     
+    # Calculate total number of spins and total winnings
     total_spins = len(logs)
     total_winnings = sum(log.get('total_winnings', 0) for log in logs)
+    
+    # Calculate total bets placed
     total_bets = sum(log['bet_amount'] for log in logs)
     
+    # Calculate cumulative average winnings
     cumulative_winnings = 0
     cumulative_avg_wins = []
     for i, log in enumerate(logs):
         cumulative_winnings += log.get('total_winnings', 0)
         cumulative_avg_wins.append(cumulative_winnings / (i + 1))
     
+    # Calculate average win per spin
     average_win = total_winnings / total_spins if total_spins > 0 else 0
+    
+    # Calculate Return to Player (RTP) percentage
     rtp = (total_winnings / total_bets) * 100 if total_bets > 0 else 0
     
+    # Return a dictionary with all calculated statistics
     return {
         "total_spins": total_spins,
         "total_winnings": total_winnings,
@@ -117,38 +126,57 @@ def check_file_changes():
     global last_modified_time
     while True:
         try:
+            # Get the current modification time of the logs file
             current_modified_time = os.path.getmtime('logs.json')
+            # Check if the file has been modified since last check
             if current_modified_time != last_modified_time:
+                # Update the last modified time
                 last_modified_time = current_modified_time
+                # Signal that an update is needed
                 update_needed.set()
         except FileNotFoundError:
+            # If the file is not found, continue silently
             pass
+        # Sleep for a short duration before next check
         time.sleep(0.1)  # Check every 100ms for more responsiveness
 
 def save_probabilities(sender, app_data, user_data):
+    # Initialize a dictionary to store new probabilities
     new_probabilities = {}
+    # Iterate through each reel and its symbols
     for reel, symbols in user_data.items():
+        # Get the new probability values from the UI sliders
         new_probabilities[reel] = {symbol: dpg.get_value(tag) for symbol, tag in symbols.items()}
+    # Update the probabilities in the backend
     update_probabilities(new_probabilities)
+    # Update the UI to show that probabilities have been saved
     dpg.set_value("save_status", "Probabilities saved!")
 
 def apply_to_all_reels(sender, app_data, user_data):
+    # Get the selected source reel from the combo box
     source_reel = dpg.get_value("source_reel_combo")
+    # Create a dictionary of slider tags for each reel and symbol
     slider_tags = {reel: {symbol: f"{reel}_{symbol}_slider" for symbol in get_reel_probabilities()[reel]} for reel in get_reel_probabilities()}
     
+    # Get the probabilities from the source reel
     source_probabilities = {symbol: dpg.get_value(slider_tags[source_reel][symbol]) for symbol in slider_tags[source_reel]}
     
+    # Apply the source reel probabilities to all other reels
     for reel in slider_tags:
         if reel != source_reel:
             for symbol, probability in source_probabilities.items():
                 dpg.set_value(slider_tags[reel][symbol], probability)
     
+    # Update the UI to show that probabilities have been applied
     dpg.set_value("apply_status", f"Applied {source_reel} probabilities to all reels!")
 
 def toggle_probabilities_window():
+    # Check if the Reel Probabilities window exists
     if dpg.does_item_exist("Reel Probabilities"):
+        # If it exists, delete it (close the window)
         dpg.delete_item("Reel Probabilities")
     else:
+        # If it doesn't exist, create the window
         create_reel_probability_window()
 
 def create_reel_probability_window():
@@ -239,16 +267,29 @@ def main():
     dpg.destroy_context()
 
 def create_plot(label, x_label, y_label, tag, height=200, width=380, series_type="line"):
+    # Create a plot with the given label, height, and width
     with dpg.plot(label=label, height=height, width=width):
+        # Add a legend to the plot
         dpg.add_plot_legend()
+        
+        # Add x-axis with label and tag
         x_axis = dpg.add_plot_axis(dpg.mvXAxis, label=x_label, tag=f"{tag}_x")
+        
+        # Add y-axis with label and tag
         y_axis = dpg.add_plot_axis(dpg.mvYAxis, label=y_label, tag=f"{tag}_y")
+        
+        # Add the appropriate series type based on the series_type parameter
         if series_type == "line":
+            # Add a line series for continuous data
             dpg.add_line_series([], [], label=label, parent=y_axis, tag=tag)
         elif series_type == "bar":
+            # Add a bar series for categorical or discrete data
             dpg.add_bar_series([], [], label=label, parent=y_axis, tag=tag)
         elif series_type == "stem":
+            # Add a stem series for discrete data points
             dpg.add_stem_series([], [], label=label, parent=y_axis, tag=tag)
+        # Note: The series are initialized with empty data ([], [])
+        # Data will be populated later when updating the plot
 
 if __name__ == "__main__":
     main()
