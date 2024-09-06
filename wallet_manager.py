@@ -141,6 +141,12 @@ def update_player_balance(amount):
     with open('player_balance.txt', 'w') as f:
         f.write(str(new_balance))
 
+def set_player_balance(balance, tokens=0):
+    wallet = {"balance": balance, "tokens": tokens}
+    with open('player_wallet.json', 'w') as f:
+        json.dump(wallet, f, indent=4)
+    print(f"Balance manually set to ${balance:.2f}")
+
 # Example usage
 if __name__ == "__main__":
     print(f"Initial player balance: {get_player_balance()}")

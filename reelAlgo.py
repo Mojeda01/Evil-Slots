@@ -6,9 +6,13 @@ from wallet_manager import place_bet, add_winnings, get_player_balance, convert_
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
 from config_manager import get_reel_probabilities, get_symbol_payouts
 import random
+from itertools import product
+from functools import lru_cache
 
 # SYMBOLS LIST
 sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']
+
+HOUSE_EDGE = 0.05  # 5% house edge
 
 def selected_model():
     # Load reel configuration and symbol payouts from config_manager
@@ -20,18 +24,13 @@ def selected_model():
     BONUS_TRIGGER = 3  # Number of bonus symbols needed to trigger the bonus game
 
     def spin_reels():
-        """Simulates spinning of the reels using weighted random selection with numpy."""
-        # Pre-calculate probabilities for each reel
-        reel_probabilities = {
-            reel_name: np.array(list(reel.values())) / sum(reel.values())
-            for reel_name, reel in reels.items()
-        }
-        # Generate 15 symbols (3 rows x 5 columns)
-        return [
-            [np.random.choice(list(reels[f'Reel{i+1}'].keys()), p=reel_probabilities[f'Reel{i+1}'])
-             for _ in range(3)]
-            for i in range(5)
-        ]
+        result = []
+        for i in range(5):
+            reel = reels[f'Reel{i+1}']
+            symbols = list(reel.keys())
+            weights = list(reel.values())
+            result.append([random.choices(symbols, weights=weights)[0] for _ in range(3)])
+        return result
 
     def check_bonus_trigger(symbols):
         """Check if the bonus round is triggered based on the number of BONUS symbols."""
@@ -75,10 +74,20 @@ def selected_model():
         print("An error occurred in the bonus game.")
         return 0
 
+    @lru_cache(maxsize=None)
+    def calculate_symbol_probability(symbol, reel_index):
+        reel = reels[f'Reel{reel_index + 1}']
+        total = sum(reel.values())
+        return reel.get(symbol, 0) / total
+
+    def calculate_combination_probability(symbols):
+        probabilities = [calculate_symbol_probability(symbol, i) if symbol != '*' else 1 
+                         for i, symbol in enumerate(symbols)]
+        return np.prod(probabilities)
+
     def check_win(result):
-        """Check if the spin result matches any winning combination across multiple paylines."""
         total_points = 0
-        total_payout = 0
+        max_payout = 0
         triggered_events = []
         winning_paylines = []
         
@@ -105,23 +114,18 @@ def selected_model():
             
             # Check each winning combination against the current payline
             for combo in combinations:
-                # Check if all symbols in the payline match the combination
-                # '*' in the combination acts as a wildcard
-                matches = all(
-                    symbol == combo['symbols'][i] or combo['symbols'][i] == '*'
-                    for i, symbol in enumerate(line_result)
-                )
+                matches = all(symbol == combo['symbols'][i] or combo['symbols'][i] == '*'
+                              for i, symbol in enumerate(line_result))
                 if matches:
-                    # If there's a match, add points and payout, and record the winning payline
                     total_points += combo['points']
-                    total_payout += symbol_payouts.get(combo['symbols'][0], combo['payout'])
+                    max_payout = max(max_payout, symbol_payouts.get(combo['symbols'][0], 0))
                     winning_paylines.append(payline_names[i])
-                    # Check if this combination triggers a special event
                     if 'trigger' in combo:
                         triggered_events.append(combo['trigger'])
+                    break  # Stop checking after first match on this payline
 
-        # Return the total points won, total payout, any triggered events, and the winning paylines
-        return total_points, total_payout, triggered_events, winning_paylines
+        # Return the total points won, max payout, any triggered events, and the winning paylines
+        return total_points, max_payout, triggered_events, winning_paylines
 
     def log_result(result, bet_amount, points, winnings, balance, jackpot_win=0, bonus_win=0, current_jackpot=0):
         """Log the game result to a JSON file, including jackpot and bonus information."""
@@ -218,7 +222,7 @@ def selected_model():
             if events:
                 print(f'Triggered events: {", ".join(events)}')
 
-            winnings = payout * bet_amount  # Use payout multiplier instead of points
+            winnings = payout  # payout is now the actual amount, not a multiplier
 
             # Bonus points section
             print("Bonus points:")
@@ -235,7 +239,10 @@ def selected_model():
 
             if winnings > 0:
                 winnings += bet_amount  # Add the original bet back if there's a win
+                # Apply house edge
+                winnings *= (1 - HOUSE_EDGE)
                 print(f"Returning your original bet of {'$' if not use_tokens else ''}{bet_amount:.2f}")
+                print(f"House edge of {HOUSE_EDGE*100}% applied")
 
             add_winnings(winnings, use_tokens)
             

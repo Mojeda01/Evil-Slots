@@ -13,14 +13,14 @@ DEFAULT_CONFIG = {
         'Reel5': {s: 1 for s in ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']},
     },
     'symbol_payouts': {
-        'CHER': 5,
-        'ONIO': 7,
-        'CLOC': 10,
-        'STAR': 15,
-        'DIAMN': 20,
-        'WILD': 25,
-        'BONUS': 30,
-        'SCAT': 35,
+        'CHER': 2,  # pays 2x the bet amount
+        'ONIO': 3,
+        'CLOC': 4,
+        'STAR': 5,
+        'DIAMN': 10,
+        'WILD': 15,
+        'BONUS': 20,
+        'SCAT': 25,
         'JACKP': 50
     }
 }
