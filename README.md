@@ -10,6 +10,10 @@ This project implements a slot machine reel algorithm without a graphical user i
 
 ### 1. Slot Machine Algorithm (reelAlgo.py)
 
+<p align="center">
+  <img src="slots.png" alt="Slot Machine Simulation Project Icon" width="500">
+</p>
+
 This script implements the core logic of the slot machine game. Key features include:
 
 - 🟢 Reel spinning mechanism with configurable symbol probabilities
