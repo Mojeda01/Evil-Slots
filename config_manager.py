@@ -11,6 +11,17 @@ DEFAULT_CONFIG = {
         'Reel3': {s: 1 for s in ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']},
         'Reel4': {s: 1 for s in ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']},
         'Reel5': {s: 1 for s in ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']},
+    },
+    'symbol_payouts': {
+        'CHER': 5,
+        'ONIO': 7,
+        'CLOC': 10,
+        'STAR': 15,
+        'DIAMN': 20,
+        'WILD': 25,
+        'BONUS': 30,
+        'SCAT': 35,
+        'JACKP': 50
     }
 }
 
@@ -40,3 +51,7 @@ def update_probabilities(new_probabilities):
 def get_reel_probabilities():
     config = load_config()
     return config['reels']
+
+def get_symbol_payouts():
+    config = load_config()
+    return config.get('symbol_payouts', DEFAULT_CONFIG['symbol_payouts'])

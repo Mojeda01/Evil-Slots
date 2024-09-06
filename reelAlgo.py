@@ -4,15 +4,16 @@ from datetime import datetime
 from combination_list import combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance, convert_to_tokens, convert_to_money, deposit_to_player, withdraw_to_bank
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
-from config_manager import get_reel_probabilities
+from config_manager import get_reel_probabilities, get_symbol_payouts
 import random
 
 # SYMBOLS LIST
 sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']
 
 def selected_model():
-    # Load reel configuration from config_manager
+    # Load reel configuration and symbol payouts from config_manager
     reels = get_reel_probabilities()
+    symbol_payouts = get_symbol_payouts()
     
     # Define special symbols and trigger conditions
     BONUS_SYMBOL = "BONUS"
@@ -77,6 +78,7 @@ def selected_model():
     def check_win(result):
         """Check if the spin result matches any winning combination across multiple paylines."""
         total_points = 0
+        total_payout = 0
         triggered_events = []
         winning_paylines = []
         
@@ -110,15 +112,16 @@ def selected_model():
                     for i, symbol in enumerate(line_result)
                 )
                 if matches:
-                    # If there's a match, add points and record the winning payline
+                    # If there's a match, add points and payout, and record the winning payline
                     total_points += combo['points']
+                    total_payout += symbol_payouts.get(combo['symbols'][0], combo['payout'])
                     winning_paylines.append(payline_names[i])
                     # Check if this combination triggers a special event
                     if 'trigger' in combo:
                         triggered_events.append(combo['trigger'])
 
-        # Return the total points won, any triggered events, and the winning paylines
-        return total_points, triggered_events, winning_paylines
+        # Return the total points won, total payout, any triggered events, and the winning paylines
+        return total_points, total_payout, triggered_events, winning_paylines
 
     def log_result(result, bet_amount, points, winnings, balance, jackpot_win=0, bonus_win=0, current_jackpot=0):
         """Log the game result to a JSON file, including jackpot and bonus information."""
@@ -184,7 +187,7 @@ def selected_model():
         current_jackpot = load_jackpot()
         print(f"Current {'tokens' if use_tokens else 'balance'}: {'$' if not use_tokens else ''}{current_balance:.2f}")
         print(f"Current jackpot: ${current_jackpot:.2f}")
-        y
+        
         if current_balance < bet_amount:
             print("Not enough balance to place bet.")
             return
@@ -200,7 +203,7 @@ def selected_model():
             for row in range(3):
                 print(" | ".join(result[col][row] for col in range(5)))
 
-            points, events, winning_paylines = check_win(result)
+            points, payout, events, winning_paylines = check_win(result)
             print(f'Points won: {points}')
             
             if winning_paylines:
@@ -215,7 +218,7 @@ def selected_model():
             if events:
                 print(f'Triggered events: {", ".join(events)}')
 
-            winnings = points * 0.1  # Convert points to actual winnings
+            winnings = payout * bet_amount  # Use payout multiplier instead of points
 
             # Bonus points section
             print("Bonus points:")
