@@ -12,11 +12,11 @@
 4. ReelAlgo.py - Make it more customizable:
     - [X] Option to control the probability of each symbol on each reel.
     - [X] Option to control the payout for each symbol combination.
-5. AI and Machine Learning:
-    - [ ] Use machine learning to analyze player behavior and personalize the gaming experience.
-6. Backend Development - Added more points to this section below:
+5. Backend Development - Added more points to this section below:
     - [ ] Create a server to handle player accounts and transactions securely.
     - [ ] Implement a database to store player data and game statistics.
+6. AI and Machine Learning:
+    - [ ] Use machine learning to analyze player behavior and personalize the gaming experience.
 7. Game Variations:
     - [ ] Add different themes or "machines" with unique symbols and payouts
     - [ ] Implement multi-player features or tournaments.
