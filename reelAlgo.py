@@ -1,13 +1,12 @@
 import numpy as np
 import json
 from datetime import datetime
+from functools import lru_cache
 from combination_list import combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance, convert_to_tokens, convert_to_money, deposit_to_player, withdraw_to_bank
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
 from config_manager import get_reel_probabilities, get_symbol_payouts
-import random
-from itertools import product
-from functools import lru_cache
+from advanced_rng import SlotMachineRNG
 
 # SYMBOLS LIST
 sym = ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']
@@ -23,14 +22,14 @@ def selected_model():
     BONUS_SYMBOL = "BONUS"
     BONUS_TRIGGER = 3  # Number of bonus symbols needed to trigger the bonus game
 
+    # Create an instance of SlotMachineRNG
+    rng = SlotMachineRNG()
+
     def spin_reels():
-        result = []
-        for i in range(5):
-            reel = reels[f'Reel{i+1}']
-            symbols = list(reel.keys())
-            weights = list(reel.values())
-            result.append([random.choices(symbols, weights=weights)[0] for _ in range(3)])
-        return result
+        """
+        Generate a spin result using the advanced RNG.
+        """
+        return rng.generate_spin(reels)
 
     def check_bonus_trigger(symbols):
         """Check if the bonus round is triggered based on the number of BONUS symbols."""
