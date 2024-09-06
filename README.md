@@ -1,7 +1,7 @@
 # Slot Machine Simulation Project
 
 <p align="center">
-  <img src="icon.png" alt="Slot Machine Simulation Project Icon" width="200">
+  <img src="icon.png" alt="Slot Machine Simulation Project Icon" width="500">
 </p>
 
 This project simulates a slot machine game with a graphical user interface and a diagnostics tool for performance analysis and game configuration.
