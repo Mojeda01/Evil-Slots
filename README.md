@@ -28,7 +28,9 @@ This script implements the core logic of the slot machine game. Key features inc
 The script provides a text-based interface for playing the game, allowing users to place bets, spin the reels, and participate in bonus rounds. It now offers a more balanced and realistic slot machine experience with improved game economics.
 
 ### 2. Diagnostics Tool (diagnostics_tool.py)
-
+<p align="center">
+  <img src="diagnostics.png" alt="Slot Machine Simulation Project Icon" width="200">
+</p>
 This tool provides real-time analysis, visualization of the slot machine's performance, and control over game probabilities and payouts. Features include:
 
 - 🟢 Automatic updates based on changes in the log file
