@@ -127,7 +127,7 @@ def selected_model():
             "result": result,
             "bet_amount": bet_amount,
             "points_won": points,
-            "regular_winnings": winnings - jackpot_win - bonus_win,
+            "regular_winnings": winnings - jackpot_win - bonus_win - (bet_amount if winnings > 0 else 0),
             "jackpot_win": jackpot_win,
             "bonus_win": bonus_win,
             "total_winnings": winnings,
@@ -184,7 +184,7 @@ def selected_model():
         current_jackpot = load_jackpot()
         print(f"Current {'tokens' if use_tokens else 'balance'}: {'$' if not use_tokens else ''}{current_balance:.2f}")
         print(f"Current jackpot: ${current_jackpot:.2f}")
-        
+        y
         if current_balance < bet_amount:
             print("Not enough balance to place bet.")
             return
@@ -216,7 +216,7 @@ def selected_model():
                 print(f'Triggered events: {", ".join(events)}')
 
             winnings = points * 0.1  # Convert points to actual winnings
-            
+
             # Bonus points section
             print("Bonus points:")
             if check_bonus_trigger(result):
@@ -229,6 +229,10 @@ def selected_model():
                     print("No additional winnings from the Bonus Round.")
             else:
                 print("No bonus round triggered.")
+
+            if winnings > 0:
+                winnings += bet_amount  # Add the original bet back if there's a win
+                print(f"Returning your original bet of {'$' if not use_tokens else ''}{bet_amount:.2f}")
 
             add_winnings(winnings, use_tokens)
             
