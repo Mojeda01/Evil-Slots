@@ -11,7 +11,7 @@
     - [X] Fine-tune the probabilities and payouts to achieve desired return-to-player (RTP) rates.
 4. ReelAlgo.py - Make it more customizable:
     - [X] Option to control the probability of each symbol on each reel.
-    - [ ] Option to control the payout for each symbol combination.
+    - [X] Option to control the payout for each symbol combination.
 5. AI and Machine Learning:
     - [ ] Use machine learning to analyze player behavior and personalize the gaming experience.
 6. Backend Development - Added more points to this section below:
