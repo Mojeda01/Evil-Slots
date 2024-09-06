@@ -132,3 +132,5 @@ Dependencies:
 - 🟢 Enhance the diagnostics tool with more advanced analytics
 - 🟢 Add more customization options for the slot machine configuration
 - 🟢 Implement real-time synchronization between probability changes and the running game
+
+*A Project by: Marco Å. Ojeda*
