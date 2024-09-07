@@ -13,8 +13,9 @@
     - [X] Option to control the probability of each symbol on each reel.
     - [X] Option to control the payout for each symbol combination.
 5. Backend Development - Added more points to this section below:
-    - [ ] 2. Create a server to handle player accounts and transactions securely.
-    - [ ] 1. Implement a database to store player data and game statistics.
+    - [X] 2. Create a server to handle player accounts and transactions securely.
+    - [X] 1. Implement a database to store player data and game statistics.
+    - [ ] 3. Add probability control to the PostGreSQL database. and making it adjustable in the dearpygui interface.
 6. AI and Machine Learning:
     - [ ] Use machine learning to analyze player behavior and personalize the gaming experience.
 7. Game Variations:
