@@ -133,4 +133,13 @@ Dependencies:
 - 🟢 Add more customization options for the slot machine configuration
 - 🟢 Implement real-time synchronization between probability changes and the running game
 
+
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Copy `sample.env` to `.env` and update with your database credentials
+4. Run `python database.py` to set up the database
+
 *A Project by: Marco Å. Ojeda*
