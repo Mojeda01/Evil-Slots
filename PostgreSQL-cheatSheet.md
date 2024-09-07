@@ -15,9 +15,9 @@
     - From psql prompt: `\c database_name`
 6. Creating a Table:
     ```
-       CREATE TABLE table_name (
+        CREATE TABLE table_name (
         column1 datatype,
-     column2 datatype,
+        column2 datatype,
      ...
    );
     ```
