@@ -1,5 +1,6 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from db_models import Base
 import os
 from dotenv import load_dotenv
@@ -13,8 +14,10 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Remove this line as Base is now imported from db_models
-# Base = declarative_base()
+metadata = MetaData()
+metadata.reflect(bind=engine)  # This line reflects the current database structure
+
+Base = declarative_base(metadata=metadata)
 
 def get_db():
     db = SessionLocal()
