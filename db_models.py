@@ -7,15 +7,17 @@ Base = declarative_base()
 
 class Player(Base):
     __tablename__ = "players"
+
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)  # Make sure this line is present
+    email = Column(String, unique=True, index=True)
     password_hash = Column(String)
-    balance = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    balance = Column(Float)
+    created_at = Column(DateTime)
     last_login = Column(DateTime)
-    total_spins = Column(Integer, default=0)
-    total_winnings = Column(Float, default=0.0)
+    total_spins = Column(Integer)
+    total_winnings = Column(Float)
+    token_conversion_rate = Column(Float, default=1.0)
     
     sessions = relationship("GameSession", back_populates="player")
     transactions = relationship("Transaction", back_populates="player")
@@ -41,6 +43,12 @@ class GameResult(Base):
     outcome = Column(String)
     winnings = Column(Float)
     timestamp = Column(DateTime, default=datetime.utcnow)
+    points_won = Column(Integer, default=0)
+    regular_winnings = Column(Float, default=0.0)
+    jackpot_win = Column(Float, default=0.0)
+    bonus_win = Column(Float, default=0.0)
+    balance_after = Column(Float)
+    current_jackpot = Column(Float)
     
     session = relationship("GameSession", back_populates="game_results")
 
@@ -53,5 +61,10 @@ class Transaction(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
     
     player = relationship("Player", back_populates="transactions")
+
+class Jackpot(Base):
+    __tablename__ = "jackpots"
+    id = Column(Integer, primary_key=True, index=True)
+    value = Column(Float, default=1000.0)
 
 # You might want to add more models like Jackpot or BonusGame if needed
