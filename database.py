@@ -1,9 +1,10 @@
+from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from db_models import Base
 import os
 from dotenv import load_dotenv
+import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 # Load environment variables
 load_dotenv()
@@ -19,6 +20,9 @@ metadata.reflect(bind=engine)  # This line reflects the current database structu
 
 Base = declarative_base(metadata=metadata)
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def get_db():
     db = SessionLocal()
     try:
@@ -27,7 +31,11 @@ def get_db():
         db.close()
 
 def create_tables():
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Tables created successfully.")
+    except SQLAlchemyError as e:
+        logger.error(f"An error occurred while creating tables: {e}")
 
 if __name__ == "__main__":
     create_tables()

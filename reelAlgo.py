@@ -2,6 +2,7 @@ import numpy as np
 import json
 from datetime import datetime
 from functools import lru_cache
+import random  # Add this import statement
 from combination_list import combinations
 from wallet_manager import place_bet, add_winnings, get_player_balance, deposit_to_player, withdraw_to_bank
 from jackpot_manager import increment_jackpot, check_jackpot_win, load_jackpot, reset_jackpot
