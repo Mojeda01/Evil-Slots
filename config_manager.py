@@ -3,6 +3,7 @@ import os
 from sqlalchemy.orm import Session
 from db_models import ReelConfiguration, SymbolPayout
 from database import SessionLocal
+import logging
 
 CONFIG_FILE = 'slot_config.json'
 
@@ -27,6 +28,9 @@ DEFAULT_CONFIG = {
         'JACKP': 50
     }
 }
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def load_config():
     config_path = CONFIG_FILE  # Use the constant defined at the top of the file

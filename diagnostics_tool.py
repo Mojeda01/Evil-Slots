@@ -5,8 +5,12 @@ import time
 import os
 from config_manager import get_reel_probabilities, update_probabilities, get_symbol_payouts, update_symbol_payouts
 from database import SessionLocal
-from db_models import GameResult
-from sqlalchemy import func
+from db_models import GameResult, ReelConfiguration
+from sqlalchemy import func, exc as SQLAlchemy
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 last_modified_time = 0
 update_needed = threading.Event()
@@ -41,7 +45,6 @@ def calculate_stats(logs):
     }
 
 def update_stats():
-    """Updates the statistics display in the diagnostics tool."""
     dpg.set_value("status", "Updating...")
     logs = load_logs()
     stats = calculate_stats(logs)
@@ -108,91 +111,118 @@ def update_stats():
     
     dpg.set_value("status", "Up to date")
 
-def save_probabilities(sender, app_data, user_data):
-    """Saves the new reel probabilities to the configuration."""
-    # Initialize a dictionary to store new probabilities
+def save_probabilities_callback(sender, app_data, user_data):
     new_probabilities = {}
-    # Iterate through each reel and its symbols
-    for reel, symbols in user_data.items():
-        # Get the new probability values from the UI sliders
-        new_probabilities[reel] = {symbol: dpg.get_value(tag) for symbol, tag in symbols.items()}
-    # Update the probabilities in the backend
-    update_probabilities(new_probabilities)
-    # Update the UI to show that probabilities have been saved
-    dpg.set_value("save_status", "Probabilities saved!")
+    for reel in range(1, 6):
+        new_probabilities[f'Reel{reel}'] = {}
+        for symbol in ['CHER', 'ONIO', 'CLOC', 'STAR', 'DIAMN', 'WILD', 'BONUS', 'SCAT', 'JACKP']:
+            value = dpg.get_value(f"prob_{reel}_{symbol}")
+            if value is None:
+                logger.warning(f"Missing probability for Reel{reel}, symbol {symbol}. Setting to 0.0")
+                value = 0.0
+            else:
+                try:
+                    value = float(value)
+                except ValueError:
+                    logger.warning(f"Invalid probability for Reel{reel}, symbol {symbol}. Setting to 0.0")
+                    value = 0.0
+            new_probabilities[f'Reel{reel}'][symbol] = value
+    
+    logger.info(f"Sending probabilities to save: {new_probabilities}")
+    save_probabilities(new_probabilities)
+    dpg.set_value("save_status", "Probabilities saved and verified!")
+
+def save_probabilities(new_probabilities):
+    db = SessionLocal()
+    try:
+        logger.info(f"Attempting to save new probabilities: {new_probabilities}")
+        for reel, symbols in new_probabilities.items():
+            reel_number = int(reel[4:])
+            logger.debug(f"Processing reel {reel_number}")
+            for symbol, probability in symbols.items():
+                logger.debug(f"Saving {symbol} with probability {probability} for reel {reel_number}")
+                config = db.query(ReelConfiguration).filter(
+                    ReelConfiguration.reel_number == reel_number,
+                    ReelConfiguration.symbol == symbol
+                ).first()
+                if config:
+                    logger.debug(f"Updating existing configuration for {symbol}")
+                    config.probability = probability
+                else:
+                    logger.debug(f"Creating new configuration for {symbol}")
+                    new_config = ReelConfiguration(reel_number=reel_number, symbol=symbol, probability=probability)
+                    db.add(new_config)
+        db.commit()
+        logger.info("Probabilities saved successfully")
+        
+        # Verify save
+        saved_probs = get_reel_probabilities()
+        logger.info(f"Verifying saved probabilities: {saved_probs}")
+        
+        # Compare saved probabilities with input
+        for reel, symbols in new_probabilities.items():
+            for symbol, probability in symbols.items():
+                saved_prob = saved_probs[reel].get(symbol)
+                if saved_prob != probability:
+                    logger.error(f"Mismatch for {reel} {symbol}: Input {probability}, Saved {saved_prob}")
+                else:
+                    logger.debug(f"Verified {reel} {symbol}: {probability}")
+        
+        logger.info("Probability verification complete")
+    except SQLAlchemy.exc.SQLAlchemyError as e:
+        logger.error(f"Database error occurred: {str(e)}")
+        db.rollback()
+    finally:
+        db.close()
 
 def apply_to_all_reels(sender, app_data, user_data):
-    """Applies the probabilities from one reel to all other reels."""
-    # Get the selected source reel from the combo box
     source_reel = dpg.get_value("source_reel_combo")
-    # Create a dictionary of slider tags for each reel and symbol
-    slider_tags = {reel: {symbol: f"{reel}_{symbol}_slider" for symbol in get_reel_probabilities()[reel]} for reel in get_reel_probabilities()}
+    slider_tags = {reel: {symbol: f"prob_{reel[4]}_{symbol}" for symbol in symbols} 
+                   for reel, symbols in get_reel_probabilities().items()}
     
-    # Get the probabilities from the source reel
-    source_probabilities = {symbol: dpg.get_value(slider_tags[source_reel][symbol]) for symbol in slider_tags[source_reel]}
+    source_probabilities = {symbol: dpg.get_value(slider_tags[source_reel][symbol]) 
+                            for symbol in slider_tags[source_reel]}
     
-    # Apply the source reel probabilities to all other reels
     for reel in slider_tags:
         if reel != source_reel:
             for symbol, probability in source_probabilities.items():
                 dpg.set_value(slider_tags[reel][symbol], probability)
     
-    # Update the UI to show that probabilities have been applied
     dpg.set_value("apply_status", f"Applied {source_reel} probabilities to all reels!")
 
 def toggle_probabilities_window():
-    """Toggles the visibility of the Reel Probabilities window."""
-    # Check if the Reel Probabilities window exists
     if dpg.does_item_exist("Reel Probabilities"):
-        # If it exists, delete it (close the window)
         dpg.delete_item("Reel Probabilities")
     else:
-        # If it doesn't exist, create the window
         create_reel_probability_window()
 
 def create_reel_probability_window():
-    """Creates a new window for adjusting reel probabilities."""
     with dpg.window(label="Reel Probabilities", width=400, height=500, tag="Reel Probabilities"):
         dpg.add_text("Adjust Reel Probabilities")
         
-        # Add a combo box to select the source reel for copying probabilities
         dpg.add_combo(("Reel1", "Reel2", "Reel3", "Reel4", "Reel5"), label="Source Reel", default_value="Reel1", tag="source_reel_combo")
-        
-        # Add a button to apply the selected reel's probabilities to all other reels
         dpg.add_button(label="Apply to All Reels", callback=apply_to_all_reels, tag="apply_to_all_button")
-        
-        # Add a text element to display the status of the "Apply to All" operation
         dpg.add_text("", tag="apply_status")
         
-        # Dictionary to store slider tags for each reel and symbol
         slider_tags = {}
-        # Get the current probabilities for all reels
         current_probabilities = get_reel_probabilities()
         
         if not current_probabilities:
             dpg.add_text("Error loading probabilities. Please check database connection.")
         else:
-            # Iterate through each reel and its symbols
             for reel, symbols in current_probabilities.items():
-                # Create a collapsing header for each reel
                 with dpg.collapsing_header(label=reel):
                     reel_sliders = {}
-                    # Create a slider for each symbol in the reel
                     for symbol, probability in symbols.items():
-                        tag = f"{reel}_{symbol}_slider"
-                        # Add a float slider with range 0-1 for probability adjustment
-                        dpg.add_slider_float(label=symbol, min_value=0, max_value=1, default_value=probability, tag=tag)
+                        tag = f"prob_{reel[4]}_{symbol}"
+                        dpg.add_slider_float(label=symbol, min_value=0, max_value=1, default_value=float(probability), format="%.4f", tag=tag)
                         reel_sliders[symbol] = tag
-                    # Store the sliders for this reel in the slider_tags dictionary
                     slider_tags[reel] = reel_sliders
         
-            # Add a button to save the adjusted probabilities
-            dpg.add_button(label="Save Probabilities", callback=save_probabilities, user_data=slider_tags)
-            # Add a text element to display the status of the save operation
+            dpg.add_button(label="Save Probabilities", callback=save_probabilities_callback, user_data=slider_tags)
             dpg.add_text("", tag="save_status")
 
 def create_symbol_payout_window():
-    """Creates a new window for adjusting symbol payouts."""
     if dpg.does_item_exist("Symbol Payouts"):
         dpg.delete_item("Symbol Payouts")
     
@@ -200,25 +230,21 @@ def create_symbol_payout_window():
         current_payouts = get_symbol_payouts()
         input_tags = {}
         
-        # Create input fields for each symbol's payout
         for symbol, payout in current_payouts.items():
             tag = f"{symbol}_payout_input"
             dpg.add_input_float(label=symbol, default_value=payout, tag=tag)
             input_tags[symbol] = tag
         
-        # Add buttons for saving and resetting payouts
         dpg.add_button(label="Save Payouts", callback=save_payouts, user_data=input_tags)
         dpg.add_button(label="Reset to Default", callback=reset_payouts, user_data=input_tags)
         dpg.add_text("", tag="payout_status")
 
 def save_payouts(sender, app_data, user_data):
-    """Saves the new payout values to the configuration."""
     new_payouts = {symbol: dpg.get_value(tag) for symbol, tag in user_data.items()}
     update_symbol_payouts(new_payouts)
     dpg.set_value("payout_status", "Payouts updated successfully!")
 
 def reset_payouts(sender, app_data, user_data):
-    """Resets the payout values to their defaults."""
     default_payouts = {
         'CHER': 5, 'ONIO': 7, 'CLOC': 10, 'STAR': 15, 'DIAMN': 20,
         'WILD': 25, 'BONUS': 30, 'SCAT': 35, 'JACKP': 50
@@ -264,13 +290,12 @@ def main():
     dpg.show_viewport()
     
     while dpg.is_dearpygui_running():
-        update_stats()  # Update stats on each frame
+        update_stats()
         dpg.render_dearpygui_frame()
 
     dpg.destroy_context()
 
 def create_plot(label, x_label, y_label, tag, height=200, width=380, series_type="line"):
-    """Creates a new plot with the given label, height, and width."""
     with dpg.plot(label=label, height=height, width=width):
         dpg.add_plot_legend()
         x_axis = dpg.add_plot_axis(dpg.mvXAxis, label=x_label, tag=f"{tag}_x")
