@@ -67,4 +67,17 @@ class Jackpot(Base):
     id = Column(Integer, primary_key=True, index=True)
     value = Column(Float, default=1000.0)
 
+class ReelConfiguration(Base):
+    __tablename__ = "reel_configurations"
+    id = Column(Integer, primary_key=True, index=True)
+    reel_number = Column(Integer)
+    symbol = Column(String)
+    probability = Column(Float)
+
+class SymbolPayout(Base):
+    __tablename__ = "symbol_payouts"
+    id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String, unique=True)
+    payout = Column(Float)
+
 # You might want to add more models like Jackpot or BonusGame if needed

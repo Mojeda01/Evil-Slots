@@ -1,5 +1,8 @@
 import json
 import os
+from sqlalchemy.orm import Session
+from db_models import ReelConfiguration, SymbolPayout
+from database import SessionLocal
 
 CONFIG_FILE = 'slot_config.json'
 
@@ -44,21 +47,55 @@ def save_config(config):
         json.dump(config, f, indent=4)
 
 def update_probabilities(new_probabilities):
-    config = load_config()
-    config['reels'] = new_probabilities
-    save_config(config)
+    db = SessionLocal()
+    try:
+        for reel, symbols in new_probabilities.items():
+            reel_number = int(reel[4:])  # Extract number from 'Reel1', 'Reel2', etc.
+            for symbol, probability in symbols.items():
+                config = db.query(ReelConfiguration).filter(
+                    ReelConfiguration.reel_number == reel_number,
+                    ReelConfiguration.symbol == symbol
+                ).first()
+                if config:
+                    config.probability = probability
+                else:
+                    new_config = ReelConfiguration(reel_number=reel_number, symbol=symbol, probability=probability)
+                    db.add(new_config)
+        db.commit()
+    finally:
+        db.close()
 
 def get_reel_probabilities():
-    config = load_config()
-    return config['reels']
+    db = SessionLocal()
+    try:
+        reels = {}
+        for reel in range(1, 6):  # Assuming 5 reels
+            reel_config = db.query(ReelConfiguration).filter(ReelConfiguration.reel_number == reel).all()
+            reels[f'Reel{reel}'] = {config.symbol: float(config.probability) for config in reel_config}
+        return reels
+    finally:
+        db.close()
 
 def get_symbol_payouts():
-    config = load_config()
-    return config.get('symbol_payouts', DEFAULT_CONFIG['symbol_payouts'])
+    db = SessionLocal()
+    try:
+        payouts = db.query(SymbolPayout).all()
+        return {payout.symbol: payout.payout for payout in payouts}
+    finally:
+        db.close()
 
 def update_symbol_payouts(new_payouts):
-    config = load_config()
-    config['symbol_payouts'] = new_payouts
-    save_config(config)
+    db = SessionLocal()
+    try:
+        for symbol, payout in new_payouts.items():
+            symbol_payout = db.query(SymbolPayout).filter(SymbolPayout.symbol == symbol).first()
+            if symbol_payout:
+                symbol_payout.payout = payout
+            else:
+                new_symbol_payout = SymbolPayout(symbol=symbol, payout=payout)
+                db.add(new_symbol_payout)
+        db.commit()
+    finally:
+        db.close()
 
 __all__ = ['get_reel_probabilities', 'update_probabilities', 'get_symbol_payouts', 'update_symbol_payouts']

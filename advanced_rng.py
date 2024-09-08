@@ -45,7 +45,7 @@ class SlotMachineRNG:
         return os.urandom(32)  # 256-bit key for AES
 
     def _encrypt_number(self, number, key):
-        """Encrypt a number using AES."""
+        """Encrypt a float number using AES."""
         backend = default_backend()
         iv = os.urandom(16)
         cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=backend)
@@ -54,14 +54,14 @@ class SlotMachineRNG:
         return iv + encrypted
 
     def _decrypt_number(self, encrypted, key):
-        """Decrypt a number using AES."""
+        """Decrypt a float number using AES."""
         backend = default_backend()
         iv = encrypted[:16]
         ciphertext = encrypted[16:]
         cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=backend)
         decryptor = cipher.decryptor()
         decrypted = decryptor.update(ciphertext) + decryptor.finalize()
-        return int(decrypted.decode())
+        return float(decrypted.decode())
 
     def generate_spin(self, reel_config):
         """
@@ -91,7 +91,7 @@ class SlotMachineRNG:
         total_weight = sum(weights)
         reel_result = []
         for _ in range(3):  # Generate 3 symbols per reel
-            number = self.generator.randint(1, total_weight)
+            number = self.generator.uniform(0, total_weight)
             encrypted_number = self._encrypt_number(number, encryption_key)
             decrypted_number = self._decrypt_number(encrypted_number, encryption_key)
             symbol = self._map_number_to_symbol(decrypted_number, symbols, weights)

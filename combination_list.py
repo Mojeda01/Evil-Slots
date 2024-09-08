@@ -16,7 +16,7 @@ combinations = [
     {'symbols': ['DIAMN', 'DIAMN', 'DIAMN', 'DIAMN', '*'], 'points': 300, 'payout': 7.5},
 
     # 3 of a kind
-    {'symbols': ['CHER', 'CHER', 'CHER', '*', '*'], 'points': 50, 'payout': 1.25},
+    {'symbols': ['CHER', 'CHER', 'CHER', '*', '*'], 'points': 15, 'payout': 1},  # Changed payout to 1x
     {'symbols': ['ONIO', 'ONIO', 'ONIO', '*', '*'], 'points': 40, 'payout': 1},
     {'symbols': ['CLOC', 'CLOC', 'CLOC', '*', '*'], 'points': 30, 'payout': 0.75},
     {'symbols': ['STAR', 'STAR', 'STAR', '*', '*'], 'points': 20, 'payout': 0.5},

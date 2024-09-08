@@ -152,7 +152,6 @@ def toggle_probabilities_window():
 
 def create_reel_probability_window():
     """Creates a new window for adjusting reel probabilities."""
-    # Create a new window for adjusting reel probabilities
     with dpg.window(label="Reel Probabilities", width=400, height=500, tag="Reel Probabilities"):
         dpg.add_text("Adjust Reel Probabilities")
         
@@ -169,24 +168,28 @@ def create_reel_probability_window():
         slider_tags = {}
         # Get the current probabilities for all reels
         current_probabilities = get_reel_probabilities()
-        # Iterate through each reel and its symbols
-        for reel, symbols in current_probabilities.items():
-            # Create a collapsing header for each reel
-            with dpg.collapsing_header(label=reel):
-                reel_sliders = {}
-                # Create a slider for each symbol in the reel
-                for symbol, probability in symbols.items():
-                    tag = f"{reel}_{symbol}_slider"
-                    # Add a float slider with range 0-1 for probability adjustment
-                    dpg.add_slider_float(label=symbol, min_value=0, max_value=1, default_value=probability, tag=tag)
-                    reel_sliders[symbol] = tag
-                # Store the sliders for this reel in the slider_tags dictionary
-                slider_tags[reel] = reel_sliders
         
-        # Add a button to save the adjusted probabilities
-        dpg.add_button(label="Save Probabilities", callback=save_probabilities, user_data=slider_tags)
-        # Add a text element to display the status of the save operation
-        dpg.add_text("", tag="save_status")
+        if not current_probabilities:
+            dpg.add_text("Error loading probabilities. Please check database connection.")
+        else:
+            # Iterate through each reel and its symbols
+            for reel, symbols in current_probabilities.items():
+                # Create a collapsing header for each reel
+                with dpg.collapsing_header(label=reel):
+                    reel_sliders = {}
+                    # Create a slider for each symbol in the reel
+                    for symbol, probability in symbols.items():
+                        tag = f"{reel}_{symbol}_slider"
+                        # Add a float slider with range 0-1 for probability adjustment
+                        dpg.add_slider_float(label=symbol, min_value=0, max_value=1, default_value=probability, tag=tag)
+                        reel_sliders[symbol] = tag
+                    # Store the sliders for this reel in the slider_tags dictionary
+                    slider_tags[reel] = reel_sliders
+        
+            # Add a button to save the adjusted probabilities
+            dpg.add_button(label="Save Probabilities", callback=save_probabilities, user_data=slider_tags)
+            # Add a text element to display the status of the save operation
+            dpg.add_text("", tag="save_status")
 
 def create_symbol_payout_window():
     """Creates a new window for adjusting symbol payouts."""
